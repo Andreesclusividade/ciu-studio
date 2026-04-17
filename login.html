@@ -63,19 +63,19 @@
   </div>
 
   <script>
-    function go(){
-      const pwd = document.getElementById('pwd').value;
-      if(pwd === 'ciu2026pro'){
-        localStorage.setItem('ciu-ok','1');
-        window.location.href = '/ciu-studio-v10.2.html';
-      }else{
-        document.getElementById('msg').textContent = 'Senha incorreta';
-      }
+  function go(){
+    const pwd = document.getElementById('pwd').value;
+    if(pwd === 'ciu2026pro'){
+      localStorage.setItem('ciu-ok','1');
+      window.location.replace('/ciu-studio-v10.2.html');
+    }else{
+      document.getElementById('msg').textContent = 'Senha incorreta';
     }
-    if(localStorage.getItem('ciu-ok') === '1'){
-  window.location.href = '/ciu-studio-v10.2.html';
-}
-    }
+  }
+
+  if(localStorage.getItem('ciu-ok') === '1'){
+    window.location.replace('/ciu-studio-v10.2.html');
+  }
   </script>
 </body>
 </html>
