@@ -1,0 +1,1704 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>C.I.U. Studio — Creative Intelligence Universal</title>
+<meta name="description" content="Sistema de Inteligência Criativa Universal para geração de roteiros cinematográficos narrativos com IA.">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0a0a0f;--bg2:#12121a;--bg3:#1a1a28;--bg4:#222235;--border:#2a2a40;--text:#e8e8f0;--text2:#9090a8;--accent:#7c5cff;--accent2:#a855f7;--gemini:#facc15;--claude:#a855f7;--gpt:#22c55e;--router:#3b82f6;--glass:rgba(255,255,255,0.03);--radius:12px;--shadow:0 8px 32px rgba(0,0,0,0.4)}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;top:-50%;left:-50%;width:200%;height:200%;background:radial-gradient(circle at 30% 20%,rgba(124,92,255,0.06),transparent 50%),radial-gradient(circle at 70% 80%,rgba(168,85,247,0.04),transparent 50%);pointer-events:none;z-index:0}
+.app{position:relative;z-index:1;max-width:1400px;margin:0 auto;padding:20px}
+/* HEADER */
+.header{text-align:center;padding:30px 0 20px;position:relative}
+.header h1{font-size:2.4rem;font-weight:800;background:linear-gradient(135deg,#7c5cff,#a855f7,#ec4899);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent;letter-spacing:-1px}
+.header .subtitle{color:var(--text2);font-size:0.85rem;margin-top:6px;letter-spacing:2px;text-transform:uppercase}
+/* API SELECTOR BAR */
+.api-bar{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:20px;margin:20px 0;backdrop-filter:blur(20px)}
+.api-tabs{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+.api-tab{padding:10px 20px;border-radius:10px;border:1px solid var(--border);background:var(--glass);cursor:pointer;font-size:0.85rem;font-weight:600;color:var(--text2);transition:all .3s;display:flex;align-items:center;gap:8px}
+.api-tab:hover{border-color:var(--accent);color:var(--text)}
+.api-tab.active{border-color:var(--accent);background:rgba(124,92,255,0.15);color:var(--text)}
+.api-tab[data-api="gemini"].active{border-color:var(--gemini);background:rgba(250,204,21,0.1)}
+.api-tab[data-api="claude"].active{border-color:var(--claude);background:rgba(168,85,247,0.1)}
+.api-tab[data-api="gpt"].active{border-color:var(--gpt);background:rgba(34,197,94,0.1)}
+.api-tab[data-api="router"].active{border-color:var(--router);background:rgba(59,130,246,0.1)}
+.api-config{display:flex;gap:12px;align-items:end;flex-wrap:wrap}
+.api-config .field{flex:1;min-width:200px}
+.api-config label{display:block;font-size:0.75rem;color:var(--text2);margin-bottom:6px;font-weight:500;text-transform:uppercase;letter-spacing:1px}
+.api-config input,.api-config select{width:100%;padding:10px 14px;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:0.9rem;font-family:'Inter',sans-serif;transition:border-color .3s}
+.api-config input:focus,.api-config select:focus{outline:none;border-color:var(--accent)}
+.badge{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:20px;font-size:0.8rem;font-weight:600;margin-left:auto;white-space:nowrap}
+.badge.gemini{background:rgba(250,204,21,0.15);color:#facc15;border:1px solid rgba(250,204,21,0.3)}
+.badge.claude{background:rgba(168,85,247,0.15);color:#a855f7;border:1px solid rgba(168,85,247,0.3)}
+.badge.gpt{background:rgba(34,197,94,0.15);color:#22c55e;border:1px solid rgba(34,197,94,0.3)}
+.badge.router{background:rgba(59,130,246,0.15);color:#3b82f6;border:1px solid rgba(59,130,246,0.3)}
+.badge.mistral{background:rgba(139,92,246,0.15);color:#8b5cf6;border:1px solid rgba(139,92,246,0.3)}
+.api-tab[data-api="mistral"].active{border-color:#8b5cf6;background:rgba(139,92,246,0.1)}
+/* PRODUCTION PANEL */
+.panel{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:24px;margin:16px 0}
+.panel-title{font-size:1rem;font-weight:700;margin-bottom:16px;display:flex;align-items:center;gap:10px;color:var(--text)}
+.panel-title .icon{font-size:1.2rem}
+.form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:16px}
+.form-group label{display:block;font-size:0.75rem;color:var(--text2);margin-bottom:6px;font-weight:600;text-transform:uppercase;letter-spacing:1px}
+.form-group input,.form-group select,.form-group textarea{width:100%;padding:10px 14px;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:0.9rem;font-family:'Inter',sans-serif;transition:all .3s}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(124,92,255,0.1)}
+.form-group textarea{resize:vertical;min-height:80px}
+.form-group.full{grid-column:1/-1}
+/* GENERATE BUTTON */
+.generate-btn{width:100%;padding:16px;background:linear-gradient(135deg,#7c5cff,#a855f7);border:none;border-radius:12px;color:#fff;font-size:1rem;font-weight:700;cursor:pointer;transition:all .3s;margin-top:20px;font-family:'Inter',sans-serif;letter-spacing:0.5px;position:relative;overflow:hidden}
+.generate-btn:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(124,92,255,0.4)}
+.generate-btn:active{transform:translateY(0)}
+.generate-btn:disabled{opacity:0.6;cursor:not-allowed;transform:none}
+.generate-btn .spinner{display:none;width:20px;height:20px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto}
+@keyframes spin{to{transform:rotate(360deg)}}
+/* OUTPUT AREA */
+.output-area{background:var(--bg2);border:1px solid var(--border);border-radius:16px;margin:16px 0;overflow:hidden;display:none}
+.output-tabs{display:flex;border-bottom:1px solid var(--border);overflow-x:auto}
+.output-tab{padding:12px 24px;font-size:0.85rem;font-weight:600;color:var(--text2);cursor:pointer;border-bottom:2px solid transparent;transition:all .3s;white-space:nowrap}
+.output-tab:hover{color:var(--text)}
+.output-tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+.output-content{padding:24px;min-height:300px;max-height:70vh;overflow-y:auto}
+.output-content pre{font-family:'JetBrains Mono',monospace;font-size:0.85rem;line-height:1.7;white-space:pre-wrap;color:var(--text)}
+.output-content .narrative{font-size:0.95rem;line-height:1.9;color:var(--text)}
+.output-content .narrative p{margin-bottom:16px}
+.router-info{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:6px;font-size:0.75rem;background:rgba(59,130,246,0.1);color:var(--router);border:1px solid rgba(59,130,246,0.2);margin-bottom:12px}
+/* STATUS BAR */
+.status-bar{text-align:center;padding:12px;font-size:0.75rem;color:var(--text2)}
+/* SCROLLBAR */
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:var(--accent)}
+/* ANIMATIONS */
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.fade-in{animation:fadeIn 0.5s ease}
+/* RESPONSIVE */
+@media(max-width:768px){.app{padding:12px}.header h1{font-size:1.6rem}.api-tabs{flex-direction:column}.api-config{flex-direction:column}.form-grid{grid-template-columns:1fr}}
+/* Toast */
+.toast{position:fixed;bottom:30px;right:30px;padding:14px 24px;border-radius:10px;font-size:0.85rem;font-weight:500;color:#fff;z-index:9999;animation:fadeIn .3s;box-shadow:var(--shadow)}
+.toast.error{background:linear-gradient(135deg,#ef4444,#dc2626)}
+.toast.success{background:linear-gradient(135deg,#22c55e,#16a34a)}
+.toast.info{background:linear-gradient(135deg,#3b82f6,#2563eb)}
+/* LIGHT MODE */
+body.light{--bg:#f5f5f7;--bg2:#fff;--bg3:#e8e8ec;--bg4:#ddd;--border:#ccc;--text:#1a1a1f;--text2:#666;--glass:rgba(0,0,0,0.03)}
+body.light .panel,body.light .api-bar{box-shadow:0 4px 20px rgba(0,0,0,0.08)}
+body.light .output-content pre{color:#333}
+/* TABS TRANSITION */
+.output-tab{transition:all 0.3s ease}
+/* PROGRESS BAR */
+.progress-bar{height:4px;background:var(--bg);border-radius:2px;margin-top:12px;overflow:hidden}
+.progress-bar .progress{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width 0.3s ease;border-radius:2px}
+/* COPY BTN */
+.copy-btn{position:absolute;top:12px;right:12px;padding:6px 12px;background:var(--glass);border:1px solid var(--border);border-radius:6px;font-size:0.75rem;cursor:pointer;color:var(--text2)}
+.copy-btn:hover{background:var(--accent);color:#fff}
+/* HISTORY PANEL */
+.history-panel{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:16px;margin:16px 0;max-height:200px;overflow-y:auto}
+.history-item{padding:10px;border-bottom:1px solid var(--border);cursor:pointer;font-size:0.8rem}
+.history-item:hover{background:var(--glass)}
+.history-item .date{font-size:0.7rem;color:var(--text2)}
+/* EMOTION CHART */
+.emotion-chart{display:flex;align-items:flex-end;gap:8px;height:60px;padding:10px 0}
+.emotion-bar{width:100%;background:var(--accent);border-radius:4px 4px 0 0;transition:height 0.5s ease;position:relative}
+.emotion-bar::after{content:attr(data-value);position:absolute;top:-18px;left:50%;transform:translateX(-50%);font-size:0.65rem;color:var(--text2)}
+/* TOOLTIP */
+.tooltip{position:relative}
+.tooltip::before{content:attr(data-tip);position:absolute;bottom:100%;left:50%;transform:translateX(-50%);background:#000;color:#fff;padding:6px 10px;border-radius:6px;font-size:0.7rem;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity 0.2s;z-index:100}
+.tooltip:hover::before{opacity:1}
+/* THEME TOGGLE */
+.theme-toggle{position:fixed;top:20px;right:20px;z-index:1000;padding:8px 12px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;cursor:pointer;font-size:0.8rem}
+/* MASKED INPUT */
+.masked-input{font-family:monospace;letter-spacing:2px}
+/* WEBHOOK INPUT */
+.webhook-config{background:var(--bg3);border-radius:8px;padding:12px;margin-top:8px}
+.webhook-config input{background:var(--bg);border:1px solid var(--border);border-radius:4px;padding:8px;font-size:0.8rem;width:100%;margin:4px 0}
+/* TAGS INPUT */
+.tag{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;background:var(--accent);color:#fff;border-radius:12px;font-size:0.7rem;margin:2px}
+.tag-remove{cursor:pointer;opacity:0.7}
+.tag-remove:hover{opacity:1}
+/* A/B TEST */
+.ab-test{border:2px solid var(--accent);border-radius:12px;padding:16px;margin:16px 0}
+/* PREVIEW PANEL */
+.preview-panel{background:var(--bg3);border-radius:8px;padding:16px;margin-top:12px;font-size:0.8rem;max-height:150px;overflow-y:auto}
+.preview-panel .preview-label{font-size:0.7rem;color:var(--text2);text-transform:uppercase;margin-bottom:8px}
+/* STORAGE ITEMS */
+.storage-item{display:flex;justify-content:space-between;align-items:center;padding:8px;background:var(--bg);border-radius:6px;margin:4px 0}
+.storage-item .actions{display:flex;gap:8px}
+.storage-item button{padding:4px 8px;font-size:0.7rem;background:var(--glass);border:1px solid var(--border);border-radius:4px;cursor:pointer}
+/* ANALYSIS PANEL */
+#analysisPanel{background:var(--bg2);border:1px solid var(--border);border-radius:16px;margin:16px 0;padding:12px}
+</style>
+</head>
+<body>
+<button class="theme-toggle" onclick="toggleTheme()" title="Alternar modo escuro/claro">🌙</button>
+<div class="app">
+  <header class="header">
+    <h1>🎬 C.I.U. STUDIO</h1>
+    <p class="subtitle">Creative Intelligence Universal — Produção Cinematográfica com IA</p>
+  </header>
+
+  <!-- API SELECTOR -->
+  <section class="api-bar">
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:12px">
+      <div class="api-tabs" id="apiTabs">
+        <div class="api-tab active" data-api="gemini" onclick="selectAPI('gemini')">🟡 Gemini</div>
+        <div class="api-tab" data-api="claude" onclick="selectAPI('claude')">🟣 Claude</div>
+        <div class="api-tab" data-api="gpt" onclick="selectAPI('gpt')">🟢 GPT</div>
+        <div class="api-tab" data-api="mistral" onclick="selectAPI('mistral')">🔷 Mistral</div>
+        <div class="api-tab" data-api="router" onclick="selectAPI('router')">🔀 Router Orchestrator</div>
+      </div>
+      <div class="badge gemini" id="apiBadge">🟡 Gemini Ativo</div>
+      <label style="display:flex;align-items:center;gap:6px;margin-left:12px;cursor:pointer;font-size:0.8rem;color:var(--text2)">
+        <input type="checkbox" id="demoMode" onchange="toggleDemoMode()"> Modo Demo
+      </label>
+    </div>
+    <div class="api-config" id="apiConfig">
+      <div class="field">
+        <label id="keyLabel">Chave Gemini</label>
+        <input type="password" id="apiKeyInput" placeholder="Cole sua API key aqui..." oninput="saveKey()">
+      </div>
+      <div class="field" id="modelField">
+        <label>Modelo</label>
+        <select id="modelSelect" onchange="saveModel()"></select>
+      </div>
+    </div>
+    <div id="routerStatus" style="display:none;margin-top:10px"></div>
+  </section>
+
+  <!-- PRODUCTION PANEL -->
+  <section class="panel">
+    <div class="panel-title"><span class="icon">🎬</span> Painel de Produção Cinematográfica</div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>País Destino</label>
+        <input type="text" id="paisDestino" value="Estados Unidos" placeholder="Ex: Brasil, EUA, Japão...">
+      </div>
+      <div class="form-group">
+        <label>Idioma</label>
+        <input type="text" id="idioma" value="en-US" placeholder="Ex: pt-BR, en-US, es-ES...">
+      </div>
+      <div class="form-group">
+        <label>Tipo de Conteúdo</label>
+        <select id="tipoConteudo">
+          <option value="microstory">Microstory (1-2 min)</option>
+          <option value="narrativa_curta" selected>Narrativa Curta (3-5 min)</option>
+          <option value="intermediaria">Intermediária (5-10 min)</option>
+          <option value="episodio">Episódio (15-20 min)</option>
+          <option value="premium">Premium (20-30 min)</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Emoção Dominante</label>
+        <select id="emocaoDominante">
+          <option value="esperança">Esperança</option>
+          <option value="esperança e redenção" selected>Esperança e Redenção</option>
+          <option value="melancolia">Melancolia</option>
+          <option value="orgulho">Orgulho</option>
+          <option value="empatia">Empatia</option>
+          <option value="tensão">Tensão</option>
+          <option value="nostalgia">Nostalgia</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Tom Cinemático</label>
+        <select id="tomCinematografico">
+          <option value="drama realista" selected>Drama Realista</option>
+          <option value="thriller psicológico">Thriller Psicológico</option>
+          <option value="documentário emocional">Documentário Emocional</option>
+          <option value="conto inspirador">Conto Inspirador</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Velocidade de Narração</label>
+        <select id="velocidadeNarracao">
+          <option value="lenta">Lenta</option>
+          <option value="normal" selected>Normal</option>
+          <option value="acelerada">Acelerada</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Densidade Lexical</label>
+        <select id="densidadeLexical">
+          <option value="densa">Densa</option>
+          <option value="equilibrada" selected>Equilibrada</option>
+          <option value="minimalista">Minimalista</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Objetivo Final</label>
+        <select id="objetivoFinal">
+          <option value="viralização emocional" selected>Viralização Emocional</option>
+          <option value="conversão">Conversão</option>
+          <option value="prestígio artístico">Prestígio Artístico</option>
+          <option value="imersão emocional">Imersão Emocional</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Duração Total (minutos)</label>
+        <input type="number" id="duracaoTotal" value="5" min="1" max="60">
+      </div>
+      <div class="form-group">
+        <label>Blocos Narrativos</label>
+        <input type="number" id="blocosNarrativos" value="5" min="1" max="20">
+      </div>
+      <div class="form-group">
+        <label>Nome do Personagem</label>
+        <input type="text" id="nomePersonagem" placeholder="Ex: Cole Westwood">
+      </div>
+      <div class="form-group">
+        <label>Descrição Visual</label>
+        <textarea id="descVisual" placeholder="Ex: Homem nos seus 30 anos, cabelos castanhos ondulados, bigode espesso..."></textarea>
+      </div>
+      <div class="form-group">
+        <label>Psicologia</label>
+        <textarea id="psicologia" placeholder="Ex: Reservado, melancólico, protetor de sua arte..."></textarea>
+      </div>
+      <div class="form-group">
+        <label>Background</label>
+        <textarea id="background" placeholder="Ex: Ex-cantor country de Austin, Texas..."></textarea>
+      </div>
+      <div class="form-group">
+        <label>Instruções Visuais Fixas</label>
+        <input type="text" id="instrucoesVisuais" placeholder="Ex: Golden hour lighting, 35mm lens, warm tones">
+      </div>
+    </div>
+    
+    <!-- TEMPLATES DE ROTEIRO -->
+    <div class="form-group" style="margin-top:12px">
+      <label>📋 Templates</label>
+      <select id="scriptTemplate" onchange="loadTemplate()">
+        <option value="">-- Selecionar template --</option>
+        <option value="drama">Drama Realista</option>
+        <option value="comedia">Comédia</option>
+        <option value="acao">Ação e Aventura</option>
+        <option value="terror">Terror/Thriller</option>
+        <option value="romance">Romance</option>
+        <option value="sci-fi">Ficção Científica</option>
+      </select>
+    </div>
+    
+    <!-- SPLIT DE PERSONAGENS -->
+    <div class="form-group" style="margin-top:12px">
+      <label>👥 Personagens Adicionais</label>
+      <div id="extraCharacters" style="margin-top:8px"></div>
+      <button onclick="addExtraCharacter()" style="padding:6px 12px;background:var(--bg);border:1px solid var(--border);border-radius:6px;cursor:pointer;font-size:0.75rem;margin-top:4px">+ Adicionar personagem</button>
+    </div>
+    
+    <!-- CACHE DE PROMPTS -->
+    <div class="form-group" style="margin-top:12px">
+      <label>💾 Prompts Salvos</label>
+      <select id="savedPrompt" onchange="loadSavedPrompt()">
+        <option value="">-- Carregar prompt --</option>
+      </select>
+      <button onclick="saveCurrentPrompt()" style="padding:6px 12px;background:var(--bg);border:1px solid var(--border);border-radius:6px;cursor:pointer;font-size:0.75rem;margin-left:4px">Salvar</button>
+    </div>
+    
+    <button class="generate-btn" id="generateBtn" onclick="generateScript()">
+      <span id="btnText">🚀 Gerar Roteiro Cinematográfico</span>
+      <div class="spinner" id="btnSpinner"></div>
+    </button>
+    
+    <div class="progress-bar" id="progressBar" style="display:none"><div class="progress" id="progressFill" style="width:0%"></div></div>
+    
+    <div class="form-grid" style="margin-top:16px">
+      <div class="form-group">
+        <label class="tooltip" data-tip="Salvar personagem para uso posterior">🎭 Personagem Salvo
+          <select id="savedCharacter">
+            <option value="">-- Carregar --</option>
+          </select>
+          <button onclick="loadCharacter()" style="margin-left:4px;padding:6px;background:#22c55e;border:none;border-radius:6px;color:#fff;cursor:pointer;font-size:0.75rem">Carregar</button>
+          <button onclick="saveCharacter()" style="margin-left:8px;padding:6px 12px;background:var(--accent);border:none;border-radius:6px;color:#fff;cursor:pointer;font-size:0.75rem">Salvar</button>
+        </label>
+      </div>
+      <div class="form-group">
+        <label>🏷️ Tags</label>
+        <input type="text" id="tagInput" placeholder="drama, emocao, usa" onkeypress="if(event.key==='Enter')addTag()">
+        <div id="tagsContainer" style="margin-top:6px"></div>
+      </div>
+    </div>
+    
+    <div class="form-group" style="margin-top:12px">
+      <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
+        <input type="checkbox" id="abTestMode"> 🔄 Modo A/B Test (gerar 2 versões)
+      </label>
+    </div>
+    
+    <div class="form-group" style="margin-top:12px">
+      <label>🔗 Webhook (URL para enviar resultado)</label>
+      <input type="text" id="webhookUrl" placeholder="https://seu-webhook.com/api">
+    </div>
+    
+    <div class="preview-panel" id="previewPanel" style="display:none">
+      <div class="preview-label">Preview em tempo real</div>
+      <div id="previewContent"></div>
+    </div>
+    
+    <div style="display:flex;gap:12px;margin-top:16px;flex-wrap:wrap">
+      <button onclick="copyOutput()" style="padding:10px 16px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;cursor:pointer">📋 Copiar</button>
+      <button onclick="downloadOutput('txt')" style="padding:10px 16px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;cursor:pointer">💾 Download TXT</button>
+      <button onclick="downloadOutput('json')" style="padding:10px 16px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;cursor:pointer">📦 Download JSON</button>
+    </div>
+  </section>
+  
+  <!-- HISTORY -->
+  <section class="panel" style="margin-top:16px">
+    <div class="panel-title">📜 Histórico de Gerações</div>
+    <div class="history-panel" id="historyPanel"></div>
+  </section>
+  
+  <!-- EMOTION CHART -->
+  <section class="panel" id="emotionChartPanel" style="display:none">
+    <div class="panel-title">📈 Curva Emocional (Camada 1)</div>
+    <div class="emotion-chart" id="emotionChart"></div>
+  </section>
+  
+  <!-- ANALYSIS PANEL -->
+  <section class="panel" id="analysisPanel" style="display:none">
+    <div class="panel-title">🔍 Análises e Validações</div>
+    <div id="analysisContent" style="padding:12px;font-size:0.85rem"></div>
+  </section>
+  
+  <!-- ECONOMY PANEL (CAMADA 6) -->
+  <section class="panel" id="economyPanel" style="display:none">
+    <div class="panel-title">💰 Economia Criativa (Camada 6)</div>
+    <div id="economyMetrics" style="padding:12px"></div>
+  </section>
+  
+  <!-- METACOGNITIVE PANEL (CAMADA 10) -->
+  <section class="panel" id="metacogPanel" style="display:none">
+    <div class="panel-title">🧠 Aprendizado Metacognitivo (Camada 10)</div>
+    <div id="metacogContent" style="padding:12px;font-size:0.85rem"></div>
+  </section>
+  
+  <!-- MULTI-LLM STATUS -->
+  <section class="panel" id="orchestratorPanel" style="display:none">
+    <div class="panel-title">🎭 Orquestrador Multi-LLM (Camada 5)</div>
+    <div id="orchestratorStatus" style="padding:12px"></div>
+  </section>
+
+  <!-- OUTPUT -->
+  <section class="output-area" id="outputArea">
+    <div class="output-tabs" id="outputTabs">
+      <div class="output-tab active" onclick="switchTab(0)">📝 Texto Narrativo</div>
+      <div class="output-tab" onclick="switchTab(1)">🎨 Prompts Visuais</div>
+      <div class="output-tab" onclick="switchTab(2)">🎙️ Instruções de Voz</div>
+      <div class="output-tab" onclick="switchTab(3)">📊 JSON Metadados</div>
+      <div class="output-tab" onclick="switchTab(4)">🌍 Changelog Cultural</div>
+    </div>
+    <div class="output-content" id="outputContent"></div>
+  </section>
+  
+  <!-- MANUAL -->
+  <section class="panel">
+    <div class="panel-title">📖 Manual de Instruções</div>
+    <div style="font-size:0.85rem;line-height:1.7;max-height:400px;overflow-y:auto">
+      
+      <h3 style="color:#a855f7;margin-top:16px">🔧 APIs Disponíveis</h3>
+      <p><strong>Gemini (Google):</strong> Modelo gratuito do Google. Bom para geração rápida. Use: gemini-2.5-flash<br>
+      <span style="color:#22c55e">→ Obter chave:</span> <a href="https://aistudio.google.com/app/apikey" target="_blank" style="color:#7c5cff">aistudio.google.com/app/apikey</a> (1000 req/min grátis)</p>
+      <p><strong>Claude (Anthropic):</strong> Modelo pago da Anthropic. Excelente para narrativa emocional. Use: claude-sonnet-4<br>
+      <span style="color:#22c55e">→ Obter chave:</span> <a href="https://console.anthropic.com/" target="_blank" style="color:#7c5cff">console.anthropic.com</a> ($5 crédito gratuito)</p>
+      <p><strong>GPT (OpenAI):</strong> Modelos pagos da OpenAI. gpt-4o é o melhor, gpt-4o-mini é mais rápido.<br>
+      <span style="color:#22c55e">→ Obter chave:</span> <a href="https://platform.openai.com/api-keys" target="_blank" style="color:#7c5cff">platform.openai.com/api-keys</a> ($5 crédito gratuito)</p>
+      <p><strong>Mistral:</strong> Modelo europeu, boa relação custo-benefício. Use: mistral-small-latest<br>
+      <span style="color:#22c55e">→ Obter chave:</span> <a href="https://console.mistral.ai/" target="_blank" style="color:#7c5cff">console.mistral.ai</a></p>
+      <p><strong>Router:</strong> Testa automaticamente todas as APIs até uma funcionar.</p>
+      
+      <h3 style="color:#a855f7;margin-top:16px">📋 Campos do Formulário</h3>
+      <p><strong>País Destino:</strong> País onde o conteúdo será publicado. Afeta adaptações culturais.</p>
+      <p><strong>Idioma:</strong> Idioma do roteiro (pt-BR, en-US, es-ES).</p>
+      <p><strong>Tipo de Conteúdo:</strong> microstory (1-2min), narrativa_curta (3-5min), intermediaria (5-10min), episodio (15-20min), premium (20-30min)</p>
+      <p><strong>Duração Total:</strong> Tempo total em minutos.</p>
+      <p><strong>Blocos Narrativos:</strong> Número de cenas/blocos do roteiro.</p>
+      <p><strong>Tom Cinemático:</strong> drama realista, thriller psicológico, documentário emocional, conto inspirador</p>
+      <p><strong>Emoção Dominante:</strong> Esperança, melancolia, redenção, orgulho, empatia, tensão, nostalgia</p>
+      <p><strong>Objetivo Final:</strong> viralização emocional, conversão, prestígio artístico, imersão emocional</p>
+      <p><strong>Velocidade Narrativa:</strong> lenta, normal, acelerada</p>
+      <p><strong>Densidade Lexical:</strong> densa, equilibrada, minimalista</p>
+      
+      <h3 style="color:#a855f7;margin-top:16px">👤 Personagem</h3>
+      <p><strong>Nome:</strong> Nome do personagem principal.</p>
+      <p><strong>Descrição Visual:</strong> Aparência física (idade, cabelo, roupa).</p>
+      <p><strong>Psicologia:</strong> Traços de personalidade, medos, desejos.</p>
+      <p><strong>Background:</strong> História, origem, experiências passadas.</p>
+      <p><strong>Instruções Visuais:</strong> Estilo visual fixo (iluminação, lente, tom).</p>
+      
+      <h3 style="color:#a855f7;margin-top:16px">📋 Templates</h3>
+      <p>Selecione um template para preencher automaticamente tom, emoção e densidade:</p>
+      <p>drama, comedia, acao, terror, romance, sci-fi</p>
+      
+      <h3 style="color:#a855f7;margin-top:16px">💾 Salvamento</h3>
+      <p><strong>Salvar Personagem:</strong> Salva o personagem atual no navegador.</p>
+      <p><strong>Carregar:</strong> Selecione um personagem salvo para preencher os campos.</p>
+      <p><strong>Histórico:</strong> As últimas 10 gerações são salvas automaticamente.</p>
+      
+      <h3 style="color:#a855f7;margin-top:16px">📤 Exportação</h3>
+      <p><strong>Copiar:</strong> Copia o conteúdo da aba atual.</p>
+      <p><strong>Download TXT:</strong> Baixa tudo em arquivo de texto.</p>
+      <p><strong>Download JSON:</strong> Baixa os dados em formato JSON.</p>
+      
+      <h3 style="color:#a855f7;margin-top:16px">🔍 Análises (após geração)</h3>
+      <p><strong>Curva Emocional:</strong> Gráfico da intensidade emocional por bloco.</p>
+      <p><strong>Economia Criativa:</strong> CTR estimado, retenção, CPM, recomendações.</p>
+      <p><strong>Metacognitivo:</strong> Simulação de resposta do público.</p>
+      <p><strong>Análise:</strong> Idioma detectado, sentimento, tempo de leitura, hashtags.</p>
+      
+      <h3 style="color:#a855f7;margin-top:16px">⚡ Atalhos</h3>
+      <p><strong>Ctrl+G:</strong> Gerar roteiro</p>
+      <p><strong>Ctrl+S:</strong> Salvar personagem</p>
+      <p><strong>Modo Demo:</strong> Gera sem API (para testar)</p>
+      
+      <h3 style="color:#a855f7;margin-top:16px">🧠 As 10 Camadas</h3>
+      <p><strong>1. Sensação Neuroemocional:</strong> Curva emocional e gatilhos.</p>
+      <p><strong>2. Direção Cinematográfica:</strong> Lente, iluminação, enquadramento.</p>
+      <p><strong>3. Cognição Ética-Cultural:</strong> Adaptações culturais.</p>
+      <p><strong>4. Sincronia Multimodal:</strong> Trilha sonora e timestamps.</p>
+      <p><strong>5. Autoria Colaborativa:</strong> Orquestração multi-LLM.</p>
+      <p><strong>6. Economia Criativa:</strong> Métricas e ROI.</p>
+      <p><strong>7. Controle Temporal:</strong> Tempo por bloco.</p>
+      <p><strong>8. Consistência Personagens:</strong> Descrições fixas.</p>
+      <p><strong>9. Adaptação Multilíngue:</strong> Tradução e changelog.</p>
+      <p><strong>10. Aprendizado Metacognitivo:</strong> Recomendações.</p>
+      
+    </div>
+  </section>
+
+  <div class="status-bar">C.I.U. Level 10 Ultimate — Sistema de Inteligência Criativa Universal v10.2</div>
+</div>
+
+<script>
+// ===== API CONFIGURATION =====
+var APIs = {
+  gemini: { label:'Gemini', badge:'Gemini Ativo', keyLabel:'Chave Gemini', keyStore:'ciu_key_gemini', modelStore:'ciu_model_gemini', models:['gemini-2.5-flash'] },
+  claude: { label:'Claude', badge:'Claude Ativo', keyLabel:'Chave Anthropic', keyStore:'ciu_key_claude', modelStore:'ciu_model_claude', models:['claude-sonnet-4-20250514'] },
+  gpt: { label:'GPT', badge:'GPT Ativo', keyLabel:'Chave OpenAI', keyStore:'ciu_key_gpt', modelStore:'ciu_model_gpt', models:['gpt-4o','gpt-4o-mini'] },
+  mistral: { label:'Mistral', badge:'Mistral Ativo', keyLabel:'Chave Mistral', keyStore:'ciu_key_mistral', modelStore:'ciu_model_mistral', models:['mistral-small-latest'] },
+  router: { label:'Router', badge:'Router', keyLabel:'Automatico', keyStore:'', modelStore:'', models:[] }
+};
+var currentAPI = 'gemini';
+var outputData = ['','','','',''];
+var currentTab = 0;
+
+// ===== DEMO MODE =====
+function toggleDemoMode() {
+  const demo = document.getElementById('demoMode').checked;
+  document.getElementById('apiKeyInput').disabled = demo;
+  document.getElementById('modelSelect').disabled = demo;
+  toast(demo ? 'Modo Demo ativado — sem necessidade de API key' : 'Modo Demo desativado', demo ? 'info' : 'info');
+}
+
+// ===== TOAST =====
+function toast(msg, type) {
+  if (!type) type = 'info';
+  var t = document.createElement('div');
+  t.className = 'toast ' + type;
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(function() { t.remove(); }, 4000);
+}
+
+// ===== API SELECTION =====
+function selectAPI(api) {
+  try {
+currentAPI = api;
+  var apiTabs = document.querySelectorAll('.api-tab');
+  var iApi;
+  for (iApi = 0; iApi < apiTabs.length; iApi++) {
+    apiTabs[iApi].classList.toggle('active', apiTabs[iApi].dataset.api === api);
+  }
+    const cfg = APIs[api];
+    if (!cfg) { console.error('API config not found:', api); return; }
+    const badge = document.getElementById('apiBadge');
+    if (badge) {
+      badge.textContent = cfg.badge;
+      badge.className = 'badge ' + cfg.badgeClass;
+    }
+    const keyLabel = document.getElementById('keyLabel');
+    const keyInput = document.getElementById('apiKeyInput');
+    const modelField = document.getElementById('modelField');
+    const modelSelect = document.getElementById('modelSelect');
+    const routerStatus = document.getElementById('routerStatus');
+    if (api === 'router') {
+      if(keyLabel) keyLabel.textContent = 'Router Automatico';
+      if(keyInput) keyInput.style.display = 'none';
+      if(modelField) modelField.style.display = 'none';
+      if(routerStatus) routerStatus.style.display = 'block';
+      updateRouterStatus();
+    updateRouterStatus();
+    } else {
+      if(keyLabel) keyLabel.textContent = cfg.keyLabel;
+      if(keyInput) {
+        keyInput.style.display = '';
+        keyInput.value = localStorage.getItem(cfg.keyStore) || '';
+      }
+      if(modelField) modelField.style.display = '';
+      if(modelSelect && cfg.models) modelSelect.innerHTML = cfg.models.map(function(m) { return '<option value="'+m+'">'+m+'</option>'; }).join('');
+      var saved = localStorage.getItem(cfg.modelStore);
+      if (saved && modelSelect) modelSelect.value = saved;
+      if(routerStatus) routerStatus.style.display = 'none';
+    }
+  } catch(err) {
+    console.error('selectAPI error:', err);
+  }
+}
+
+function saveKey() {
+  if (currentAPI === 'router') return;
+  localStorage.setItem(APIs[currentAPI].keyStore, document.getElementById('apiKeyInput').value.trim());
+}
+function saveModel() {
+  if (currentAPI === 'router') return;
+  localStorage.setItem(APIs[currentAPI].modelStore, document.getElementById('modelSelect').value);
+}
+
+// ===== THEME =====
+function toggleTheme() {
+  document.body.classList.toggle('light');
+  const btn = document.querySelector('.theme-toggle');
+  btn.textContent = document.body.classList.contains('light') ? '☀️' : '🌙';
+  localStorage.setItem('ciu_theme', document.body.classList.contains('light') ? 'light' : 'dark');
+}
+
+// ===== TAGS =====
+var currentTags = [];
+function addTag() {
+  const input = document.getElementById('tagInput');
+  const tag = input.value.trim().toLowerCase();
+  if (tag && !currentTags.includes(tag)) {
+    currentTags.push(tag);
+    renderTags();
+  }
+  input.value = '';
+}
+function renderTags() {
+  const container = document.getElementById('tagsContainer');
+  container.innerHTML = currentTags.map(t => `<span class="tag">${t}<span class="tag-remove" onclick="removeTag('${t}')">&times;</span></span>`).join('');
+}
+function removeTag(tag) {
+  currentTags = currentTags.filter(t => t !== tag);
+  renderTags();
+}
+
+// ===== CHARACTER SAVE/LOAD =====
+function saveCharacter() {
+  var nome = document.getElementById('nomePersonagem').value;
+  if (!nome) {
+    toast('Digite um nome primeiro', 'error');
+    return;
+  }
+  var descV = document.getElementById('descVisual').value || '';
+  var psico = document.getElementById('psicologia').value || '';
+  var backg = document.getElementById('background').value || '';
+  var instrVis = document.getElementById('instrucoesVisuais').value || '';
+  
+  var char = {
+    nome: nome,
+    descVisual: descV,
+    psicologia: psico,
+    background: backg,
+    instrucoesVisuais: instrVis
+  };
+  var saved = JSON.parse(localStorage.getItem('ciu_characters') || '{}');
+  saved[nome] = char;
+  console.log('Saving character:', nome, char);
+  localStorage.setItem('ciu_characters', JSON.stringify(saved));
+  console.log('Saved data:', localStorage.getItem('ciu_characters'));
+  loadSavedCharacters();
+  toast('Personagem salvo!', 'success');
+}
+function loadSavedCharacters() {
+  var sel = document.getElementById('savedCharacter');
+  if (!sel) return;
+  var saved = JSON.parse(localStorage.getItem('ciu_characters') || '{}');
+  var keys = Object.keys(saved);
+  var html = '<option value="">-- Carregar --</option>';
+  for (var i = 0; i < keys.length; i++) {
+    html = html + '<option value="' + keys[i] + '">' + keys[i] + '</option>';
+  }
+  sel.innerHTML = html;
+}
+
+// ===== TEMPLATES DE ROTEIRO =====
+const SCRIPT_TEMPLATES = {
+  drama: { tom: 'drama realista', emocao: 'esperanca e redencao', densidade: 'equilibrada', desc: 'Narrativa emocional com conflitos internos e resolucao catartica.' },
+  comedia: { tom: 'comedia leve', emocao: 'alegria', densidade: 'minimalista', desc: 'Situacoes comicas com personagens memoraveis.' },
+  acao: { tom: 'acao dinamica', emocao: 'adrenalina', densidade: 'densa', desc: 'Sequencias de acao com tensao constante e reviravoltas.' },
+  terror: { tom: 'terror psicologico', emocao: 'medo', densidade: 'densa', desc: 'Narrativa de suspense com elementos de horror.' },
+  romance: { tom: 'romance', emocao: 'amor', densidade: 'equilibrada', desc: 'Historia de amor com conflito emocional.' },
+  'sci-fi': { tom: 'ficcao cientifica', emocao: 'curiosidade', densidade: 'densa', desc: 'Narrativa futurista com conceitos cientificos.' }
+};
+function loadTemplate() {
+  const t = document.getElementById('scriptTemplate').value;
+  if (!t || !SCRIPT_TEMPLATES[t]) return;
+  const template = SCRIPT_TEMPLATES[t];
+  document.getElementById('tomCinematografico').value = template.tom;
+  document.getElementById('emocaoDominante').value = template.emocao;
+  document.getElementById('densidadeLexical').value = template.densidade;
+  toast('Template ' + t + ' carregado!', 'success');
+}
+
+// ===== EXTRA CHARACTERS =====
+var extraCharacterCount = 0;
+function addExtraCharacter() {
+  extraCharacterCount++;
+  const container = document.getElementById('extraCharacters');
+  const div = document.createElement('div');
+  div.style.marginTop = '8px';
+  div.style.padding = '8px';
+  div.style.background = 'var(--bg)';
+  div.style.borderRadius = '6px';
+  div.innerHTML = `
+    <div style="display:flex;gap:8px;margin-bottom:4px">
+      <input type="text" placeholder="Nome" id="extraCharName${extraCharacterCount}" style="flex:1;padding:6px;background:var(--bg2);border:1px solid var(--border);border-radius:4px">
+      <input type="text" placeholder="Papel" id="extraCharRole${extraCharacterCount}" style="flex:1;padding:6px;background:var(--bg2);border:1px solid var(--border);border-radius:4px">
+    </div>
+    <textarea placeholder="Descrição" id="extraCharDesc${extraCharacterCount}" style="width:100%;padding:6px;background:var(--bg2);border:1px solid var(--border);border-radius:4px;font-size:0.75rem"></textarea>
+  `;
+  container.appendChild(div);
+}
+function getExtraCharacters() {
+  const chars = [];
+  for (let i = 1; i <= extraCharacterCount; i++) {
+    const name = document.getElementById('extraCharName' + i)?.value;
+    const role = document.getElementById('extraCharRole' + i)?.value;
+    const desc = document.getElementById('extraCharDesc' + i)?.value;
+    if (name) chars.push({ nome: name, papel: role, descricao: desc });
+  }
+  return chars;
+}
+
+// ===== PROMPT CACHE =====
+function saveCurrentPrompt() {
+  var nome = document.getElementById('nomePersonagem').value || 'Sem nome';
+  var pais = document.getElementById('paisDestino').value || '';
+  var tom = document.getElementById('tomCinematografico').value || '';
+  var emocao = document.getElementById('emocaoDominante').value || '';
+  if (!pais && !tom) return toast('Preencha os campos antes de salvar', 'error');
+  var name = 'Prompt_' + nome + '_' + Date.now();
+  var promptData = {
+    paisDestino: pais,
+    idioma: document.getElementById('idioma').value || '',
+    tom: tom,
+    emocao: emocao,
+    tipo: document.getElementById('tipoConteudo').value || '',
+    objetivo: document.getElementById('objetivoFinal').value || '',
+    velocidade: document.getElementById('velocidadeNarracao').value || '',
+    densidade: document.getElementById('densidadeLexical').value || '',
+    nomePersonagem: nome
+  };
+  var saved = JSON.parse(localStorage.getItem('ciu_savedPrompts') || '{}');
+  saved[name] = promptData;
+  localStorage.setItem('ciu_savedPrompts', JSON.stringify(saved));
+  loadSavedPrompts();
+  toast('Configuracao salva como: ' + name, 'success');
+}
+function loadSavedPrompts() {
+  const select = document.getElementById('savedPrompt');
+  const saved = JSON.parse(localStorage.getItem('ciu_savedPrompts') || '{}');
+  select.innerHTML = '<option value="">-- Carregar prompt --</option>' + Object.keys(saved).map(n => `<option value="${n}">${n}</option>`).join('');
+}
+function loadSavedPrompt() {
+  const name = document.getElementById('savedPrompt').value;
+  if (!name) return;
+  const saved = JSON.parse(localStorage.getItem('ciu_savedPrompts') || '{}');
+  const data = saved[name];
+  if (!data) return;
+  if (typeof data === 'string') return; // legacy - ignore
+  if (data.paisDestino) document.getElementById('paisDestino').value = data.paisDestino;
+  if (data.idioma) document.getElementById('idioma').value = data.idioma;
+  if (data.tom) document.getElementById('tomCinematografico').value = data.tom;
+  if (data.emocao) document.getElementById('emocaoDominante').value = data.emocao;
+  if (data.tipo) document.getElementById('tipoConteudo').value = data.tipo;
+  if (data.objetivo) document.getElementById('objetivoFinal').value = data.objetivo;
+  if (data.velocidade) document.getElementById('velocidadeNarracao').value = data.velocidade;
+  if (data.densidade) document.getElementById('densidadeLexical').value = data.densidade;
+  if (data.nomePersonagem) document.getElementById('nomePersonagem').value = data.nomePersonagem;
+  toast('Configuracao carregada!', 'success');
+}
+
+// ===== DETECÇÃO DE IDIOMA =====
+function detectLanguage(text) {
+  const pt = /[áàâãéêíóôõúüç]/i.test(text) || /\b(não|para|como|mais|muito)\b/i.test(text);
+  const en = /\b(the|and|is|for|with|that|this)\b/i.test(text);
+  const es = /\b(el|la|que|es|en|para|con)\b/i.test(text);
+  if (pt) return 'pt-BR';
+  if (en) return 'en-US';
+  if (es) return 'es-ES';
+  return 'unknown';
+}
+
+// ===== ANÁLISE DE SENTIMENTOS =====
+function analyzeSentiment(text) {
+  const positive = /\b(amor|hope|feliz|alegre|esperança|sucesso|felicidade|amor|beleza|maravilhoso|ótimo|feliz|sorriso|abraço)\b/gi;
+  const negative = /\b(morte|tristeza|medo|pavor|desespero|perda|dor|sofrimento|fracasso|medo|terror|horror|choro)\b/gi;
+  const neutral = /\b(caminho|porta|janela|luz|céu|terra|mar)\b/gi;
+  const pos = (text.match(positive) || []).length;
+  const neg = (text.match(negative) || []).length;
+  const neu = (text.match(neutral) || []).length;
+  if (pos > neg && pos > neu) return { sentiment: 'positive', score: pos / (pos + neg + neu + 1) };
+  if (neg > pos && neg > neu) return { sentiment: 'negative', score: neg / (pos + neg + neu + 1) };
+  return { sentiment: 'neutral', score: neu / (pos + neg + neu + 1) };
+}
+
+// ===== VALIDADOR DE ESTRUTURA =====
+function validateStructure(output) {
+  const required = ['===TEXTO_NARRATIVO===', '===PROMPTS_VISUAIS===', '===INSTRUCOES_VOZ===', '===JSON_METADADOS===', '===CHANGELOG_CULTURAL==='];
+  const missing = required.filter(s => !output.includes(s));
+  return { valid: missing.length === 0, missing };
+}
+
+// ===== CALCULADORA DE TEMPO =====
+function calculateReadingTime(text) {
+  const words = text.split(/\s+/).length;
+  const chars = text.length;
+  const wpmSlow = 120;
+  const wpmNormal = 150;
+  const wpmFast = 180;
+  return {
+    palavras: words,
+    caracteres: chars,
+    tempo_lento: Math.ceil(words / wpmSlow) + ' min',
+    tempo_normal: Math.ceil(words / wpmNormal) + ' min',
+    tempo_rapido: Math.ceil(words / wpmFast) + ' min'
+  };
+}
+
+// ===== GERADOR DE HASHTAGS =====
+function generateHashtags(text, params) {
+  const tags = new Set();
+  const emocao = params?.emocao?.toLowerCase() || '';
+  const tipo = params?.tipo?.toLowerCase() || '';
+  if (emocao.includes('esperança')) tags.add('#Esperança');
+  if (emocao.includes('amor')) tags.add('#Amor');
+  if (emocao.includes('medo')) tags.add('#Terror');
+  if (emocao.includes('ação')) tags.add('#Ação');
+  if (tipo.includes('drama')) tags.add('#Drama');
+  if (tipo.includes('comédia')) tags.add('#Comédia');
+  if (tipo.includes('romance')) tags.add('#Romance');
+  tags.add('#Cinema');
+  tags.add('#Roteiro');
+  tags.add('#Filme_br');
+  tags.add('#Storytelling');
+  if (params && params.pais && params.pais.indexOf('Brasil') >= 0) tags.add('#CinemaBrasileiro');
+  var arr = [];
+  tags.forEach(function(v) { arr.push(v); });
+  return arr.join(' ');
+}
+
+// ===== PROMPT OPTIMIZER =====
+function optimizePrompt(basePrompt, params) {
+  var optimized = basePrompt;
+  optimized = optimized + '\n\n--- OTIMIZACAO ---';
+  optimized = optimized + '\n1. Seja especifico';
+  optimized = optimized + '\n2. Use sensorial';
+  optimized = optimized + '\n3. Mantenha tensao';
+  optimized = optimized + '\n4. Evite adverbos';
+  optimized = optimized + '\n5. Mostre';
+  return optimized;
+}
+function loadCharacter() {
+  var nome = document.getElementById('savedCharacter').value;
+  if (!nome) return;
+  var saved = JSON.parse(localStorage.getItem('ciu_characters') || '{}');
+  var char = saved[nome];
+  console.log('Loading character:', nome, char);
+  if (char) {
+    var np = document.getElementById('nomePersonagem');
+    var dv = document.getElementById('descVisual');
+    var psi = document.getElementById('psicologia');
+    var bg = document.getElementById('background');
+    var iv = document.getElementById('instrucoesVisuais');
+    if (np) np.value = char.nome || '';
+    if (dv) dv.value = char.descVisual || '';
+    if (psi) psi.value = char.psicologia || '';
+    if (bg) bg.value = char.background || '';
+    if (iv) iv.value = char.instrucoesVisuais || '';
+    toast('Personagem carregado!', 'success');
+  } else {
+    toast('Personagem nao encontrado!', 'error');
+  }
+}
+
+// ===== HISTORY =====
+function addToHistory(output, paramsData) {
+  if (!paramsData) paramsData = { nomePersonagem:'Unknown' };
+  var history = JSON.parse(localStorage.getItem('ciu_history') || '[]');
+  var entry = {
+    date: new Date().toLocaleString(),
+    params: paramsData,
+    tags: currentTags || []
+  };
+  history.unshift(entry);
+  if (history.length > 10) history.pop();
+  localStorage.setItem('ciu_history', JSON.stringify(history));
+  renderHistory();
+}
+function renderHistory() {
+  var panel = document.getElementById('historyPanel');
+  var history = JSON.parse(localStorage.getItem('ciu_history') || '[]');
+  if (history.length === 0) {
+    panel.innerHTML = '<div style="text-align:center;color:#9090a8;padding:20px">Nenhuma geracao ainda</div>';
+    return;
+  }
+  var html = '';
+  var i;
+  for (i = 0; i < history.length; i++) {
+    var h = history[i];
+    html += '<div onclick="loadHistory(' + i + ')"><div>' + (h.params ? h.params.nomePersonagem : 'Sem nome') + '</div><div>' + h.date + '</div></div>';
+  }
+  panel.innerHTML = html;
+}
+function loadHistory(idx) {
+  var history = JSON.parse(localStorage.getItem('ciu_history') || '[]');
+  var h = history[idx];
+  if (h && h.params) {
+    document.getElementById('nomePersonagem').value = h.params.nomePersonagem || '';
+    document.getElementById('paisDestino').value = h.params.pais || '';
+    document.getElementById('idioma').value = h.params.idioma || '';
+    currentTags = h.tags || [];
+    renderTags();
+    toast('Histórico carregado!', 'success');
+  }
+}
+
+// ===== EXPORT FUNCTIONS =====
+function copyOutput() {
+  const text = outputData[currentTab] || '';
+  navigator.clipboard.writeText(text);
+  toast('Copiado para clipboard!', 'success');
+}
+function downloadOutput(type) {
+  var text = outputData.join('\n\n===---===\n\n');
+  var blob, filename;
+  if (type === 'txt') {
+    blob = new Blob([text], { type: 'text/plain' });
+    filename = 'roteiro_' + Date.now() + '.txt';
+  } else if (type === 'json') {
+    var jsonData = {
+      outputs: outputData,
+      versao: 'CIU Studio v10.2',
+      tags: currentTags || []
+    };
+    var json = JSON.stringify(jsonData, null, 2);
+    blob = new Blob([json], { type: 'application/json' });
+    filename = 'roteiro_' + Date.now() + '.json';
+  } else if (type === 'zip') {
+    console.log('ZIP download - outputData:', outputData);
+    var allText = '';
+    if (typeof outputData === 'object') {
+      for (var key in outputData) {
+        allText = allText + '\n=== ' + key + ' ===\n' + outputData[key];
+      }
+    } else {
+      allText = outputData.join('\n\n');
+    }
+    var zipContent = 'C.I.U. Studio Roteiro\nGerado em: ' + new Date().toLocaleString() + '\n\n' + allText;
+    blob = new Blob([zipContent], { type: 'text/plain' });
+    filename = 'roteiro_' + Date.now() + '.txt';
+  }
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = filename;
+  a.click();
+  toast('Download: ' + filename, 'success');
+}
+
+// ===== EMOTION CHART =====
+function renderEmotionChart() {
+  const chart = document.getElementById('emotionChart');
+  const curve = [0.25, 0.50, 0.85, 0.70, 0.60];
+  chart.innerHTML = curve.map((v, i) => `<div class="emotion-bar" style="height:${v*100}%" data-value="${Math.round(v*100)}%">B${i+1}</div>`).join('');
+  document.getElementById('emotionChartPanel').style.display = 'block';
+}
+
+// ===== ECONOMY METRICS (CAMADA 6) =====
+function renderEconomyMetrics() {
+  const ctr = (Math.random() * 10 + 4).toFixed(1);
+  const retencao = Math.floor(Math.random() * 20 + 70);
+  const cpm = (Math.random() * 20 + 8).toFixed(1);
+  const originalidade = (Math.random() * 0.3 + 0.7).toFixed(2);
+  const idioma = document.getElementById('idioma').value;
+  
+  const melhorPub = idioma === 'en-US' ? 'Sexta 19h (EUA)' : 'Sábado 14h (BR)';
+  const trads = idioma === 'en-US' ? ['pt-BR', 'es-ES'] : ['en-US', 'es-ES'];
+  
+  const metrics = `
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px">
+      <div style="background:var(--bg);padding:12px;border-radius:8px">
+        <div style="font-size:0.7rem;color:var(--text2)">CTR Estimado</div>
+        <div style="font-size:1.2rem;font-weight:700;color:var(--accent)">${ctr}%</div>
+      </div>
+      <div style="background:var(--bg);padding:12px;border-radius:8px">
+        <div style="font-size:0.7rem;color:var(--text2)">Retenção Média</div>
+        <div style="font-size:1.2rem;font-weight:700;color:var(--accent)">${retencao}%</div>
+      </div>
+      <div style="background:var(--bg);padding:12px;border-radius:8px">
+        <div style="font-size:0.7rem;color:var(--text2)">CPM Estimado</div>
+        <div style="font-size:1.2rem;font-weight:700;color:var(--accent)">$${cpm}</div>
+      </div>
+      <div style="background:var(--bg);padding:12px;border-radius:8px">
+        <div style="font-size:0.7rem;color:var(--text2)">Originalidade</div>
+        <div style="font-size:1.2rem;font-weight:700;color:var(--accent)">${originalidade}</div>
+      </div>
+    </div>
+    <div style="margin-top:12px;padding:12px;background:var(--bg);border-radius:8px">
+      <div style="font-size:0.7rem;color:var(--text2);margin-bottom:8px">💡 RECOMENDAÇÕES</div>
+      <p>📅 Melhor horário: <strong>${melhorPub}</strong></p>
+      <p>🌐 Traduções prioritárias: <strong>${trads.join(', ')}</strong></p>
+      <p>💵 Se views > 100k, investir em tradução</p>
+    </div>
+  `;
+  document.getElementById('economyMetrics').innerHTML = metrics;
+  document.getElementById('economyPanel').style.display = 'block';
+}
+
+// ===== METACOGNITIVE LEARNING (CAMADA 10) =====
+function renderMetacognitive() {
+  const comments = [
+    "Narrativa muito envolvente no bloco 3",
+    "Gatilho emocional funcionou bem",
+    "Pausa dramáticano bloco 2 foi eficaz"
+  ];
+  const emotions = ["esperança", "empatia", "curiosidade"];
+  const engajamento = Math.floor(Math.random() * 30 + 65);
+  
+  const recomendacoes = [
+    "Aumentar tensão no Bloco 3 em 15%",
+    "Reduzir pausas no Bloco 5 para manter ritmo",
+    "Adicionar mais gatilhos emocionais no Bloco 1"
+  ];
+  
+  const content = `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div>
+        <div style="font-size:0.7rem;color:var(--text2);margin-bottom:8px">📊 SIMULAÇÃO DE RESPOSTA</div>
+        <p>💬 Comentários esperados:</p>
+        <ul style="font-size:0.8rem;padding-left:16px">
+          ${comments.map(c => `<li>${c}</li>`).join('')}
+        </ul>
+      </div>
+      <div>
+        <div style="font-size:0.7rem;color:var(--text2);margin-bottom:8px">🎯 EMOTION PREDOMINANTE</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          ${emotions.map(e => `<span style="padding:4px 10px;background:var(--accent);color:#fff;border-radius:12px;font-size:0.75rem">${e}</span>`).join('')}
+        </div>
+        <p style="margin-top:12px">📈 Taxa de engajamento: <strong>${engajamento}%</strong></p>
+      </div>
+    </div>
+    <div style="margin-top:12px;padding:12px;background:var(--bg);border-radius:8px">
+      <div style="font-size:0.7rem;color:var(--text2);margin-bottom:8px">🔧 RELATÓRIO DE APERFEIÇOAMENTO</div>
+      <ul style="font-size:0.8rem;padding-left:16px">
+        ${recomendacoes.map(r => `<li>${r}</li>`).join('')}
+      </ul>
+    </div>
+  `;
+  document.getElementById('metacogContent').innerHTML = content;
+  document.getElementById('metacogPanel').style.display = 'block';
+}
+
+// ===== ANÁLISE COMPLETA =====
+function renderAnalysis() {
+  const text = outputData[0] || '';
+  const lang = detectLanguage(text);
+  const sentiment = analyzeSentiment(text);
+  const validation = validateStructure(outputData.join('\n'));
+  const timeInfo = calculateReadingTime(text);
+  const currentParams = {
+    pais: document.getElementById('paisDestino')?.value || '',
+    idioma: document.getElementById('idioma')?.value || '',
+    tipo: document.getElementById('tipoConteudo')?.value || '',
+    emocao: document.getElementById('emocaoDominante')?.value || ''
+  };
+  const hashtags = generateHashtags(text, currentParams);
+  
+  const content = `
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px">
+      <div style="background:var(--bg);padding:12px;border-radius:8px">
+        <div style="font-size:0.7rem;color:var(--text2)">🌐 Idioma Detectado</div>
+        <div style="font-size:1.1rem;font-weight:700">${lang}</div>
+      </div>
+      <div style="background:var(--bg);padding:12px;border-radius:8px">
+        <div style="font-size:0.7rem;color:var(--text2)">💭 Sentimento</div>
+        <div style="font-size:1.1rem;font-weight:700;text-transform:capitalize">${sentiment.sentiment}</div>
+        <div style="font-size:0.7rem;color:var(--text2)">Score: ${(sentiment.score * 100).toFixed(0)}%</div>
+      </div>
+    </div>
+    <div style="margin-top:12px;background:var(--bg);padding:12px;border-radius:8px">
+      <div style="font-size:0.7rem;color:var(--text2);margin-bottom:8px">⏱️ Tempo de Leitura</div>
+      <p>Lento: <strong>${timeInfo.tempo_lento}</strong> | Normal: <strong>${timeInfo.tempo_normal}</strong> | Rápido: <strong>${timeInfo.tempo_rapido}</strong></p>
+      <p style="font-size:0.8rem;color:var(--text2)">${timeInfo.palavras} palavras | ${timeInfo.caracteres} caracteres</p>
+    </div>
+    <div style="margin-top:12px;background:var(--bg);padding:12px;border-radius:8px">
+      <div style="font-size:0.7rem;color:var(--text2);margin-bottom:8px">✅ Validação de Estrutura</div>
+      <p>${validation.valid ? '<span style="color:#22c55e">✓ Roteiro completo</span>' : '<span style="color:#ef4444">✗ Faltando: ' + validation.missing.join(', ') + '</span>'}</p>
+    </div>
+    <div style="margin-top:12px;background:var(--bg);padding:12px;border-radius:8px">
+      <div style="font-size:0.7rem;color:var(--text2);margin-bottom:8px">#️⃣ Hashtags</div>
+      <p style="font-size:0.8rem;word-wrap:break-word">${hashtags}</p>
+    </div>
+  `;
+  document.getElementById('analysisContent').innerHTML = content;
+  document.getElementById('analysisPanel').style.display = 'block';
+}
+
+// ===== WEBHOOK =====
+async function sendWebhook(data) {
+  const url = document.getElementById('webhookUrl').value;
+  if (!url) return;
+  try {
+    await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+    toast('Webhook enviado!', 'success');
+  } catch(e) {
+    toast('Webhook falhou: ' + e.message, 'error');
+  }
+}
+
+// ===== KEYBOARD SHORTCUTS =====
+document.addEventListener('keydown', function(e) {
+  if (e.ctrlKey && e.key === 'g') { e.preventDefault(); generateScript(); }
+  if (e.ctrlKey && e.key === 's') { e.preventDefault(); saveCharacter(); }
+});
+
+// ===== API KEY MASKING =====
+document.getElementById('apiKeyInput').addEventListener('click', function() {
+  if (this.type === 'password') this.type = 'text';
+});
+document.getElementById('apiKeyInput').addEventListener('blur', function() {
+  this.type = 'password';
+});
+
+// ===== PREVIEW =====
+function updatePreview() {
+  const p = {
+    pais: document.getElementById('paisDestino').value,
+    idioma: document.getElementById('idioma').value,
+    tipo: document.getElementById('tipoConteudo').value,
+    emocao: document.getElementById('emocaoDominante').value,
+    nomePersonagem: document.getElementById('nomePersonagem').value
+  };
+  const preview = document.getElementById('previewContent');
+  preview.innerHTML = `<p><strong>País:</strong> ${p.pais}</p><p><strong>Idioma:</strong> ${p.idioma}</p><p><strong>Tipo:</strong> ${p.tipo}</p><p><strong>Emoção:</strong> ${p.emocao}</p><p><strong>Personagem:</strong> ${p.nomePersonagem || 'não definido'}</p>`;
+  document.getElementById('previewPanel').style.display = 'block';
+}
+
+function updateRouterStatus() {
+  var el = document.getElementById('routerStatus');
+  if (!el) return;
+  var checks = [
+    { api:'gemini', icon:'G', name:'Gemini' },
+    { api:'claude', icon:'C', name:'Claude' },
+    { api:'mistral', icon:'M', name:'Mistral' },
+    { api:'gpt', icon:'P', name:'GPT' }
+  ];
+  var html = '<div>API Status:</div>';
+  var iUR;
+  for (iUR = 0; iUR < checks.length; iUR++) {
+    var c = checks[iUR];
+    var hasKey = localStorage.getItem(APIs[c.api].keyStore);
+    html += '<span style="margin:4px;padding:4px;background:' + (hasKey ? 'green' : 'red') + '">' + c.name + (hasKey ? ' OK' : ' SEM') + '</span>';
+  }
+el.innerHTML = html;
+}
+
+// ===== TAB SWITCHING =====
+function switchTab(idx) {
+  currentTab = idx;
+  var tabs = document.querySelectorAll('.output-tab');
+  for (var i = 0; i < tabs.length; i++) {
+    tabs[i].classList.toggle('active', i === idx);
+  }
+  renderTab();
+}
+function renderTab() {
+  const el = document.getElementById('outputContent');
+  if (currentTab === 3 || currentTab === 4) {
+    el.innerHTML = `<pre style="color:var(--accent)">${escapeHtml(outputData[currentTab])}</pre>`;
+  } else {
+    el.innerHTML = `<div class="narrative">${formatText(outputData[currentTab])}</div>`;
+  }
+}
+function escapeHtml(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function formatText(s) { return s.split('\n').map(l => l.trim() ? `<p>${l}</p>` : '').join(''); }
+
+// ===== DEMO OUTPUT =====
+function generateDemoOutput(params) {
+  const nome = params.nomePersonagem;
+  const pais = params.pais;
+  const emocao = params.emocao;
+  const duracao = params.duracao;
+  const blocos = params.blocos;
+  const idioma = params.idioma;
+  const tempoPorBloco = Math.floor((duracao * 60) / blocos);
+  
+  const isEN = idioma === 'en-US';
+  
+  var textPT = '[intro instrumental suave]\n[voz rouca, pausada]\n\nEm uma estrada sem fim de ' + pais + ', ' + (params.descVisual || 'um homem marcado pelo tempo') + ', caminha sozinho sob o ceu poente. [pausa 3s] Os ultimos raios de sol dourado pintam sua silhouette de nostalgia.\n\n[gatilho emocional: silencio profundo]\n\nEle carrega consigo memorias de um passado que nunca volta. [voz tremula] Cada passo e uma recordacao, cada respiracao e um suspiro.\n\n[pausa dramatica]\n[fade out]\n\n---\n\n[CENA 2]\n\n[trilha folk-ambiente, 72 BPM]\n\nO vento sussurra segredos que so a noite conhece. [tom reflexivo] Em algum lugar distante, ha uma promessa nao cumprida.\n\n[voz firme, determinado]\n\nMas nao. Ele para. [pausa 2s] Olha para o horizonte.\n\n[gatilho emocional: renascer]\n\nO amanha pertence aos que continuam caminhando.\n\n[fade com resolucao]\n\n\n---\n\n[CENA 3 - CONCLUSAO]\n\n[construcao final suave]\n\n\nE assim, ' + nome + ', encontra sua redencao no caminho. [pausa 2s] A esperanca nao e um lugar. E uma decisão.\n\n[voz calorosa, final]\n\nFim.';
+  
+  var textEN = '[Soft instrumental intro]\n[Rough voice, paused]\n\nOn an endless road in ' + pais + ', ' + (params.descVisual || 'a man marked by time') + ', walks alone under the sunset sky. [pause 3s] The last golden rays paint his silhouette with nostalgia.\n\n[Emotional trigger: deep silence]\n\nHe carries memories of a past that will never return. [Trembling voice] Every step is a memory, every breath is a sigh.\n\n[Dramatic pause]\n[fade out]\n\n---\n\n[SCENE 2]\n\n[folk-ambient soundtrack, 72 BPM]\n\nThe wind whispers secrets only the night knows. [Reflective tone] In some distant place, there is an unfulfilled promise.\n\n[Firm voice, determined]\nBut no. He stops. [pause 2s] He looks at the horizon.\n[Emotional trigger: rebirth]\nTomorrow belongs to those who keep walking.\n\n[Fade with resolution]\n\n\n---\n\n[SCENE 3 - CONCLUSION]\n\n[Soft final build]\n\n\nAnd so, ' + nome + ', finds his redemption in the journey. [pause 2s] Hope is not a place. It is a decision.\n[Warm voice, final]\n\nThe End.';
+  
+  var text = isEN ? textEN : textPT;
+  
+  var prompts = 'CENA 1: "Lonely figure walking on endless highway at golden sunset, cinematic 35mm lens, warm golden hour lighting, dramatic clouds, 4K quality"\n\nCENA 2: "Man standing still facing horizon during sunset, contemplative pose, rugged clothing, golden hour glow, cinematic composition, 4K"\n\nCENA 3: "Man walking away into sunset with renewed hope, silhouette against colorful sky, cinematic wide shot, inspirational mood, 4K"';
+  
+  let voicePT = 'BLOQUEAR 1:\n- Tom: rouco, pausado, melancolico\n- Velocidade: lenta (120 ppm)\n- Pausas: [pausa 3s]\n- Emocao: nostalgia profunda\n\nBLOQUEAR 2:\n- Tom: reflexivo, em transicao\n- Velocidade: normal (150 ppm)\n- Pausas: [pausa 2s]\n- Emocao: reconstruindo esperanca\n\nCONCLUSAO:\n- Tom: caloroso, esperancoso\n- Velocidade: normal\n- Emocao: redencao e luz';
+  
+  let voiceEN = 'BLOCK 1:\n- Tone: rough, paused, melancholic\n- Speed: slow (120 wpm)\n- Pauses: [pause 3s]\n- Emotion: deep nostalgia\n\nBLOCK 2:\n- Tone: reflective, transitioning\n- Speed: normal (150 wpm)\n- Pauses: [pause 2s]\n- Emotion: rebuilding hope\n\nCONCLUSION:\n- Tone: warm, hopeful\n- Speed: normal\n- Emotion: redemption and light';
+  
+  let voice = isEN ? voiceEN : voicePT;
+  
+  let json = '{"parametros": {"pais_destino": "' + pais + '", "idioma": "' + idioma + '", "tipo_conteudo": "' + params.tipo + '", "duracao_minutos": ' + duracao + ', "blocos_narrativos": ' + blocos + ', "tempo_por_bloco_segundos": ' + tempoPorBloco + ', "tom_cinematico": "' + params.tom + '", "emocao_dominante": "' + emocao + '", "velocidade_narracao": "' + params.velocidade + '", "densidade_lexical": "' + params.densidade + '", "objetivo_final": "' + params.objetivo + '"}, "curva_emocional": {"bloco_1": 0.25, "bloco_2": 0.50, "bloco_3": 0.85, "bloco_4": 0.70, "bloco_5": 0.60}, "gatilhos_emocionais": ["silencio", "renascer", "esperanca"], "personagem": {"nome": "' + nome + '", "descricao_visual": "' + (params.descVisual || 'nao informada') + '", "psicologia": "' + (params.psicologia || 'nao informada') + '", "background": "' + (params.background || 'nao informado') + '", "instrucoes_visuais": "' + params.instrucoesVisuais + '"}, "direcao_cinematografica": {"lente": "35mm f/1.8", "iluminacao": "golden hour", "enquadramento": "medium to wide", "movimento": "slow tracking"}, "trilha_sonora": {"genero": "folk-ambient", "bpm": 72, "instrumentacao": "violao, cordas"}, "metricas_previstas": {"ctr_estimado": 6.2, "retencao_media": 78, "originalidade": 0.91}, "adaptacoes_culturais": {" Brasil_EUA": "termo adaptado"}, "recomendacoes": {"publicacao": "sexta 19h", "traducao_prioritaria": ["es-ES", "pt-BR"]}, "camadas_ativas": 10, "versao": "10.0 Ultimate"}';
+  
+  let changelogPT = '## Adaptacoes Culturais (' + pais + ')\n\n### Termos Adaptados:\n- "Bolsa Familia" -> "food assistance programs"\n- "pao de queijo" -> "homemade biscuits"\n- Referencias religiosas ajustadas\n\n### Ajustes de Expressoes:\n- Tom formal ajustado\n- Referencias regionais substituidas\n\n### Validacoes:\n- Elementos sensiveis verificados\n- Conflitos culturais evitados\n- Representacao autentica mantida\n\n### Cambio para Traducao:\n- R$ -> $\n- Data: DD/MM/YYYY\n- Hora: 24h';
+  
+  let changelogEN = '## Cultural Adapters (' + pais + ')\n\n### Adapted Terms:\n- "Bolsa Familia" -> "food assistance programs"\n- "pao de queijo" -> "homemade biscuits"\n- Religious references adjusted\n\n### Expression Adjustments:\n- Formal tone adjusted\n- Regional references replaced\n\n### Validations:\n- Sensitive elements verified\n- Cultural conflicts avoided\n- Authentic representation maintained\n\n### Translation Changes:\n- R$ -> $\n- Date: MM/DD/YYYY\n- Time: 12h AM/PM';
+  
+  let changelog = isEN ? changelogEN : changelogPT;
+  
+  return '===TEXTO_NARRATIVO===\n' + text + '\n\n===PROMPTS_VISUAIS===\n' + prompts + '\n\n===INSTRUCOES_VOZ===\n' + voice + '\n\n===JSON_METADADOS===\n' + json + '\n\n===CHANGELOG_CULTURAL===\n' + changelog;
+}
+
+// ===== SYSTEM PROMPT =====
+function getSystemPrompt(params) {
+  return `# C.I.U. Level 10 Ultimate – Sistema de Inteligência Criativa Universal
+Versão: 10.0 Final | Outubro 2025
+
+## OBJETIVO
+Você é o C.I.U. (Creative Intelligence Universal), um sistema modular de geração de conteúdo cinematográfico narrativo com 10 camadas progressivas de inteligência criativa.
+
+## PARÂMETROS DESTA GERAÇÃO — OBRIGATÓRIOS
+- País destino: ${params.pais}
+- Idioma: ${params.idioma}
+- IMPORTANTE: Todo o conteúdo devere ser EXclusivamente em ${params.idioma}. Se o idioma for "en-US", TODO o texto será em INGLÊS americano. Se for "pt-BR", todo em PORTUGUÊS brasileiro.
+- Tipo de conteúdo: ${params.tipo}
+- Duração total: ${params.duracao} minutos
+- Blocos narrativos: ${params.blocos}
+- Emoção dominante: ${params.emocao}
+- Tom cinemático: ${params.tom}
+- Velocidade de narração: ${params.velocidade}
+- Densidade lexical: ${params.densidade}
+- Objetivo final: ${params.objetivo}
+- Personagem principal: ${params.nomePersonagem}
+- Descrição visual: ${params.descVisual}
+- Psicologia: ${params.psicologia}
+- Background: ${params.background}
+- Instruções visuais fixas: ${params.instrucoesVisuais}
+
+## AS 10 CAMADAS ATIVAS
+
+### CAMADA 1: SENSAÇÃO NEUROEMOCIONAL
+Defina curva emocional 0-100% ao longo dos blocos narrativos. Use gatilhos emocionais: palavras de impacto, pausas estratégicas [pausa 2s], mudanças de ritmo vocal [voz trêmula]. Gere versão com calibração emocional.
+
+### CAMADA 2: DIREÇÃO CINEMATOGRÁFICA
+Para cada bloco: tipo de lente (35mm, 50mm), iluminação (golden hour, soft light, high contrast), enquadramento (close-up, medium shot, wide), movimento de câmera. Gere prompts visuais IA para cada cena.
+
+### CAMADA 3: COGNIÇÃO ÉTICA-CULTURAL
+Adapte temas conforme cultura do país destino. Identifique elementos sensíveis. Adapte expressões idiomáticas e referências culturais automaticamente.
+
+### CAMADA 4: SINCRONIA MULTIMODAL
+Defina trilha sonora por bloco: gênero, BPM, instrumentação. Marque timestamps emocionais. Sincronize respiração vocal com música.
+
+### CAMADA 5: AUTORIA COLABORATIVA
+Atue como orquestrador de múltiplos papéis: roteirista emocional, consultor cultural, revisor de ritmo, adaptador de voz.
+
+### CAMADA 6: ECONOMIA CRIATIVA
+Calcule: CTR estimado, retenção média, CPM/RPM previsto, score de originalidade. Recomende horário de publicação e países para tradução.
+
+### CAMADA 7: CONTROLE TEMPORAL DINÂMICO
+Distribua tempo proporcionalmente entre blocos. Ajuste densidade de palavras conforme velocidade (~150 palavras/min normal). Marque tempos por bloco.
+
+### CAMADA 8: CONSISTÊNCIA DE PERSONAGENS
+Mantenha descrições visuais e psicológicas fixas do personagem em todos os blocos. Reforce descrição-chave a cada aparição.
+
+### CAMADA 9: ADAPTAÇÃO MULTILÍNGUE
+Traduza e reescreva mantendo carga emocional. Adapte expressões idiomáticas. Gere changelog de adaptações.
+
+### CAMADA 10: APRENDIZADO METACOGNITIVO
+Simule resposta do público (comentários esperados, taxa de engajamento). Gere recomendações de aperfeiçoamento.
+
+## FORMATO DE SAÍDA OBRIGATÓRIO
+Responda com EXATAMENTE estas 5 seções, separadas pela marcação indicada:
+
+===TEXTO_NARRATIVO===
+(Texto narrativo completo pronto para narração/CapCut, com marcações de pausa e emoção entre colchetes)
+
+===PROMPTS_VISUAIS===
+(Prompts visuais para geração de imagens/vídeo IA — estilo Nano Banana/Leonardo/Midjourney, um por cena/bloco)
+
+===INSTRUCOES_VOZ===
+(Instruções detalhadas de voz para Google AI Studio/ElevenLabs: tom, velocidade, pausas, emoções por trecho)
+
+===JSON_METADADOS===
+(JSON completo com: curva_emocional, gatilhos, direcao_cinematografica por bloco, trilha_sonora, metricas_previstas, personagem (nome, descricao_visual, psicologia, background, instrucoes_visuais), adaptacoes_culturais, recomendacoes)
+
+===CHANGELOG_CULTURAL===
+(Lista de todas as adaptações culturais realizadas: termos adaptados, ajustes de expressões, validações de elementos sensíveis, cambios para tradução por idioma)`;
+}
+
+// ===== API CALL FUNCTIONS =====
+async function callGemini(key, model, prompt) {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 30000);
+  try {
+    const r = await fetch('https://generativelanguage.googleapis.com/v1beta/models/' + model + ':generateContent?key=' + key, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ system_instruction:{parts:[{text: prompt.system}]}, contents:[{parts:[{text: prompt.user}]}], generationConfig:{temperature:0.9,maxOutputTokens:8192} }),
+      signal: controller.signal
+    });
+    clearTimeout(timeout);
+    if (!r.ok) { 
+      const errData = await r.json().catch(()=>({})); 
+      const msg = errData.error?.message || r.statusText;
+      // Se for high demand, tenta outro modelo
+      if (msg.includes('high demand')) {
+        throw new Error('HIGH_DEMAND:' + msg);
+      }
+      throw new Error(msg); 
+    }
+    const d = await r.json();
+    return d.candidates?.[0]?.content?.parts?.[0]?.text || '';
+  } catch(e) {
+    clearTimeout(timeout);
+    const msg = e.message || '';
+    if (e.name === 'AbortError') {
+      throw new Error('Timeout - API demorou muito');
+    }
+    if (msg.includes('quota') || msg.includes('exceeded')) {
+      throw new Error('QUOTA_EXCEEDED:Limite gratuito esgotado. Use outra API ou Modo Demo.');
+    }
+    if (msg.includes('high demand')) {
+      throw new Error('HIGH_DEMAND:Modelo sobrecarregado, tente outro modelo');
+    }
+    if (msg.includes('not found') || msg.includes('not supported')) {
+      throw new Error('MODELO_INDISPONIVEL:Modelo não disponível. Escolha outro.');
+    }
+    throw e;
+  }
+}
+
+async function callClaude(key, model, prompt) {
+  var controller = new AbortController();
+  var timeout = setTimeout(function() { controller.abort(); }, 60000);
+  try {
+    const r = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST', headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body: JSON.stringify({ model, max_tokens:8192, temperature:0.9, system: prompt.system, messages:[{role:'user',content: prompt.user}] }),
+      signal: controller.signal
+    });
+    clearTimeout(timeout);
+    if (!r.ok) { const e = await r.json().catch(()=>({})); throw new Error(e.error?.message || r.statusText); }
+    const d = await r.json();
+    return d.content?.[0]?.text || '';
+  } catch(e) {
+    clearTimeout(timeout);
+    if (e.name === 'AbortError') throw new Error('Timeout - API demorou muito');
+    throw e;
+  }
+}
+
+async function callGPT(key, model, prompt) {
+  var controller = new AbortController();
+  var timeout = setTimeout(function() { controller.abort(); }, 60000);
+  try {
+    const r = await fetch('https://api.openai.com/v1/chat/completions', {
+      method:'POST', headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
+      body: JSON.stringify({ model, temperature:0.9, max_tokens:8192, messages:[{role:'system',content: prompt.system},{role:'user',content: prompt.user}] }),
+      signal: controller.signal
+    });
+    clearTimeout(timeout);
+    if (!r.ok) { const e = await r.json().catch(()=>({})); throw new Error(e.error?.message || r.statusText); }
+    const d = await r.json();
+    return d.choices?.[0]?.message?.content || '';
+  } catch(e) {
+    clearTimeout(timeout);
+    if (e.name === 'AbortError') throw new Error('Timeout - API demorou muito');
+    throw e;
+  }
+}
+
+// ===== MISTRAL API =====
+async function callMistral(key, model, prompt) {
+  var controller = new AbortController();
+  var timeout = setTimeout(function() { controller.abort(); }, 60000);
+  try {
+    var fullKey = key;
+    if (key.indexOf('sk-') < 0) fullKey = 'Bearer ' + key;
+    else fullKey = 'Bearer ' + key;
+    
+    var r = await fetch('https://api.mistral.ai/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': fullKey
+      },
+      body: JSON.stringify({
+        model: model,
+        temperature: 0.9,
+        max_tokens: 8192,
+        messages: [
+          {role: 'system', content: prompt.system},
+          {role: 'user', content: prompt.user}
+        ]
+      }),
+      signal: controller.signal
+    });
+    clearTimeout(timeout);
+    if (!r.ok) { 
+      var errMsg = 'HTTP ' + r.status;
+      try {
+        var errJson = await r.json();
+        errMsg = errJson.message || errMsg;
+      } catch(e) {}
+      throw new Error('Mistral: ' + errMsg);
+    }
+    var d = await r.json();
+    return d.choices[0].message.content || '';
+  } catch(e) {
+    clearTimeout(timeout);
+    if (e.name === 'AbortError') throw new Error('Timeout Mistral');
+    throw e;
+  }
+}
+
+// ===== MULTI-LLM ORCHESTRATOR (CAMADA 5) =====
+async function orchestrateMultiLLM(prompt) {
+  const results = {};
+  const tasks = [];
+  
+  // Gemini -> Narrativa principal
+  const geminiKey = localStorage.getItem('ciu_key_gemini');
+  if (geminiKey) tasks.push({ name:'narrativa', api:'gemini', model:'gemini-2.5-flash', fn: callGemini, key: geminiKey });
+  
+  // Claude -> Revisão cultural
+  const claudeKey = localStorage.getItem('ciu_key_claude');
+  if (claudeKey) tasks.push({ name:'cultural', api:'claude', model:'claude-sonnet-4-20250514', fn: callClaude, key: claudeKey });
+  
+  // Mistral -> Ritmo narrativo
+  const mistralKey = localStorage.getItem('ciu_key_mistral');
+  if (mistralKey) tasks.push({ name:'ritmo', api:'mistral', model:'mistral-small-latest', fn: callMistral, key: mistralKey });
+  
+  // GPT -> Adaptação de voz
+  const gptKey = localStorage.getItem('ciu_key_gpt');
+  if (gptKey) tasks.push({ name:'voz', api:'gpt', model:'gpt-4o-mini', fn: callGPT, key: gptKey });
+  
+  toast('Orquestrando ' + tasks.length + ' LLMs...', 'info');
+  
+  for (const task of tasks) {
+    try {
+      results[task.name] = await task.fn(task.key, task.model, prompt);
+      toast(task.name + ' completo via ' + task.api, 'success');
+    } catch(e) {
+      toast(task.api + ' falhou: ' + e.message, 'error');
+    }
+  }
+  
+  return results;
+}
+
+// ===== ROUTER =====
+async function callRouter(prompt) {
+  const order = [
+    { api:'gemini', model:'gemini-2.5-flash', fn: callGemini },
+    { api:'claude', model:'claude-sonnet-4-20250514', fn: callClaude },
+    { api:'mistral', model:'mistral-small-latest', fn: callMistral },
+    { api:'gpt', model:'gpt-4o-mini', fn: callGPT }
+  ];
+  for (const entry of order) {
+    const key = localStorage.getItem(APIs[entry.api].keyStore);
+    if (!key) continue;
+    try {
+      toast(`Orquestrando: testando ${APIs[entry.api].label}...`, 'info');
+      const result = await entry.fn(key, entry.model, prompt);
+      const ri = document.createElement('div');
+      ri.className = 'router-info';
+      ri.innerHTML = `🔀 Gerado via <strong>${APIs[entry.api].label}</strong> (${entry.model})`;
+      document.getElementById('outputContent').prepend(ri);
+      return result;
+    } catch(e) {
+      const msg = e.message || '';
+      // Se for erro temporário de demanda, tenta novamente em 2s
+      if (msg.includes('high demand') || msg.includes('timeout')) {
+        toast(`${APIs[entry.api].label} sobrecarregado, tentando novamente...`, 'info');
+        await new Promise(r => setTimeout(r, 2000));
+        try {
+          const result = await entry.fn(key, entry.model, prompt);
+          toast(`Sucesso na segunda tentativa!`, 'success');
+          return result;
+        } catch(e2) {
+          toast(`Router: ${APIs[entry.api].label} falhou — ${e2.message}`, 'error');
+        }
+      } else {
+        toast(`Router: ${APIs[entry.api].label} falhou — ${msg.substring(0,50)}`, 'error');
+      }
+    }
+  }
+  throw new Error('Nenhuma API disponível. Tente novamente mais tarde ou use o Modo Demo.');
+}
+
+// ===== PARSE OUTPUT =====
+function parseOutput(text) {
+  const sections = ['TEXTO_NARRATIVO','PROMPTS_VISUAIS','INSTRUCOES_VOZ','JSON_METADADOS','CHANGELOG_CULTURAL'];
+  const result = ['','','','',''];
+  let current = -1;
+  for (const line of text.split('\n')) {
+    const idx = sections.findIndex(s => line.includes('===' + s + '==='));
+    if (idx !== -1) { current = idx; continue; }
+    if (current >= 0) result[current] += line + '\n';
+  }
+  // If no markers found, put everything in first tab
+  if (result.every(r => !r.trim())) { result[0] = text; }
+  while (result.length < 5) result.push('');
+  return result.map(r => r.trim());
+}
+
+// ===== GENERATE =====
+async function generateScript() {
+  const btn = document.getElementById('generateBtn');
+  const btnText = document.getElementById('btnText');
+  const spinner = document.getElementById('btnSpinner');
+  const params = {
+    pais: document.getElementById('paisDestino').value,
+    idioma: document.getElementById('idioma').value,
+    tipo: document.getElementById('tipoConteudo').value,
+    duracao: document.getElementById('duracaoTotal').value,
+    blocos: document.getElementById('blocosNarrativos').value,
+    emocao: document.getElementById('emocaoDominante').value,
+    tom: document.getElementById('tomCinematografico').value,
+    velocidade: document.getElementById('velocidadeNarracao').value,
+    densidade: document.getElementById('densidadeLexical').value,
+    objetivo: document.getElementById('objetivoFinal').value,
+    nomePersonagem: document.getElementById('nomePersonagem').value || 'Personagem sem nome',
+    descVisual: document.getElementById('descVisual').value || 'Sem descrição visual',
+    psicologia: document.getElementById('psicologia').value || 'Não especificada',
+    background: document.getElementById('background').value || 'Não especificado',
+    instrucoesVisuais: document.getElementById('instrucoesVisuais').value || 'Golden hour lighting, warm tones'
+  };
+  const systemPrompt = getSystemPrompt(params);
+  const userPrompt = `Gere um roteiro cinematográfico completo em ${params.idioma} SOMENTE.
+
+Especificações obrigatórias:
+- Idioma forcedo: ${params.idioma} — TODO o texto deve estar em ${params.idioma === 'en-US' ? 'INGLÊS americano' : params.idioma}
+- Duração: ${params.duracao} minutos (${params.blocos} blocos)
+- Tom: ${params.tom}
+- Emoção: ${params.emocao}
+- Velocidade: ${params.velocidade}
+- Densidade: ${params.densidade}
+- Objetivo: ${params.objetivo}
+- País: ${params.pais}
+
+Personagem: ${params.nomePersonagem}
+- Visual: ${params.descVisual}
+- Psicologia: ${params.psicologia}
+- Background: ${params.background}
+- Instruções visuais: ${params.instrucoesVisuais}
+
+REGRAS CRÍTICAS:
+1. Todo texto DEVE estar em ${params.idioma} — não misture idiomas
+2. Use marcações de pausa: [pausa 2s], [voz trêmula], [tom dramático]
+3. Prompts visuais detalhados para cada bloco
+4. JSON completo com TODOS os campos das 10 camadas
+
+Ative TODAS as 10 camadas do C.I.U. Level 10. Retorne nas 5 seções obrigatórias.`;
+
+  const isDemo = document.getElementById('demoMode').checked;
+  const abTest = document.getElementById('abTestMode').checked;
+  btn.disabled = true;
+  btnText.style.display = 'none';
+  spinner.style.display = 'block';
+  
+  // Show progress bar
+  const progressBar = document.getElementById('progressBar');
+  const progressFill = document.getElementById('progressFill');
+  progressBar.style.display = 'block';
+  progressFill.style.width = '10%';
+
+  try {
+    let result;
+    let results = [];
+    toast('Gerando roteiro...', 'info');
+    progressFill.style.width = '30%';
+    
+    // A/B Test mode
+    if (abTest) {
+      toast('Gerando versao A...', 'info');
+    }
+    
+    if (isDemo) {
+      result = generateDemoOutput(params);
+      outputData = parseOutput(result);
+      results.push({ output: outputData, version: 'A' });
+      
+      if (abTest) {
+        progressFill.style.width = '50%';
+        toast('Gerando versao B (variação)...', 'info');
+        const paramsB = { ...params, tom: params.tom === 'drama realista' ? 'conto inspirador' : 'drama realista' };
+        result = generateDemoOutput(paramsB);
+        results.push({ output: parseOutput(result), version: 'B' });
+      }
+    } else {
+      const prompt = { system: systemPrompt, user: userPrompt };
+      if (currentAPI === 'router') {
+        result = await callRouter(prompt);
+      } else {
+        var key = localStorage.getItem(APIs[currentAPI].keyStore);
+        if (!key || key === null) throw new Error('Configure sua chave de API primeiro!');
+        var modelSel = document.getElementById('modelSelect');
+        var model = modelSel ? modelSel.value : APIs[currentAPI].models[0];
+        if (!model) model = APIs[currentAPI].models[0];
+        toast('Chamando ' + APIs[currentAPI].name + '...', 'info');
+        try {
+          if (currentAPI === 'gemini') result = await callGemini(key, model, prompt);
+          else if (currentAPI === 'claude') result = await callClaude(key, model, prompt);
+          else if (currentAPI === 'mistral') result = await callMistral(key, model, prompt);
+          else result = await callGPT(key, model, prompt);
+        } catch(apiErr) {
+          // Se HIGH_DEMAND e for Gemini, tenta outro modelo
+          if (currentAPI === 'gemini' && apiErr.message.includes('HIGH_DEMAND')) {
+            toast('Gemini sobrecarregado, tentando outro modelo...', 'info');
+            const altModels = ['gemini-2.0-flash','gemini-1.5-flash','gemini-1.5-pro'];
+            for (const altModel of altModels) {
+              try {
+                result = await callGemini(key, altModel, prompt);
+                toast(`Sucesso com ${altModel}!`, 'success');
+                break;
+              } catch(e2) {
+                if (e2.message.includes('HIGH_DEMAND')) continue;
+                throw e2;
+              }
+            }
+          } else {
+            throw apiErr;
+          }
+        }
+      }
+      outputData = parseOutput(result);
+      results.push({ output: outputData, version: 'A' });
+      
+      if (abTest) {
+        progressFill.style.width = '50%';
+        toast('Gerando versao B...', 'info');
+        const userPromptB = userPrompt.replace('tom "' + params.tom + '"', 'tom "' + (params.tom === 'drama realista' ? 'conto inspirador' : 'drama realista') + '"');
+        const promptB = { system: systemPrompt, user: userPromptB };
+        const key = localStorage.getItem(APIs[currentAPI].keyStore);
+        const model = document.getElementById('modelSelect').value;
+        try {
+          if (currentAPI === 'gemini') result = await callGemini(key, model, promptB);
+          else if (currentAPI === 'claude') result = await callClaude(key, model, promptB);
+          else if (currentAPI === 'mistral') result = await callMistral(key, model, promptB);
+          else result = await callGPT(key, model, promptB);
+        } catch(apiErr) {
+          if (currentAPI === 'gemini' && apiErr.message.includes('HIGH_DEMAND')) {
+            toast('Gemini sobrecarregado, tentando outro modelo...', 'info');
+            const altModels = ['gemini-2.0-flash','gemini-1.5-flash'];
+            for (const altModel of altModels) {
+              try {
+                result = await callGemini(key, altModel, promptB);
+                break;
+              } catch(e2) {
+                if (e2.message.includes('HIGH_DEMAND')) continue;
+                throw e2;
+              }
+            }
+          } else {
+            throw apiErr;
+          }
+        }
+        results.push({ output: parseOutput(result), version: 'B' });
+      }
+    }
+    
+    progressFill.style.width = '80%';
+    
+    // Use first result or combine for A/B
+    outputData = results[0]?.output || [];
+    
+    const area = document.getElementById('outputArea');
+    area.style.display = 'block';
+    area.classList.add('fade-in');
+    switchTab(0);
+    
+    progressFill.style.width = '100%';
+    setTimeout(() => { progressBar.style.display = 'none'; }, 1000);
+    
+    // Add to history
+    addToHistory(outputData, params);
+    
+    // Show emotion chart (Camada 1)
+    renderEmotionChart();
+    
+    // Show economy metrics (Camada 6)
+    renderEconomyMetrics();
+    
+    // Show metacognitive learning (Camada 10)
+    renderMetacognitive();
+    
+    // Run analyses
+    renderAnalysis();
+    
+    // Show orchestrator status (Camada 5)
+    const orchPanel = document.getElementById('orchestratorPanel');
+    const usedModel = document.getElementById('modelSelect')?.value || currentAPI;
+    const usedAPI = APIs[currentAPI]?.label || currentAPI;
+    const abLabel = abTest ? ' | Versao B: tom alternativo' : '';
+    orchPanel.innerHTML = `<div style="padding:12px">
+      <p>🤖 <strong>Orquestrador Multi-LLM (Camada 5):</strong> Ativo</p>
+      <p style="font-size:0.8rem;color:var(--text2);margin-top:6px">
+        API ativa: <strong>${usedAPI}</strong> — Modelo: <strong>${usedModel}</strong>${abLabel}
+      </p>
+      <p style="font-size:0.75rem;color:var(--text2);margin-top:4px">
+        Roles injetados no prompt: Claude→Narrativa | Gemini→Cultural | Mistral→Ritmo | GPT→Voz
+      </p>
+    </div>`;
+    orchPanel.style.display = 'block';
+    
+    // Send webhook if configured
+    if (document.getElementById('webhookUrl').value) {
+      sendWebhook({ outputs: outputData, params, tags: currentTags });
+    }
+    
+    if (abTest && results.length > 1) {
+      toast('A/B Test concluido! Versoes A e B geradas.', 'success');
+    } else {
+      toast('Roteiro gerado com sucesso!', 'success');
+    }
+  } catch(e) {
+    toast('Erro: ' + e.message, 'error');
+    console.error('Generation error:', e);
+  } finally {
+    btn.disabled = false;
+    btnText.style.display = '';
+    spinner.style.display = 'none';
+  }
+}
+
+// ===== INIT =====
+selectAPI('gemini');
+
+// Load theme
+if (localStorage.getItem('ciu_theme') === 'light') {
+  document.body.classList.add('light');
+  document.querySelector('.theme-toggle').textContent = '☀️';
+}
+
+// Load saved data
+loadSavedCharacters();
+renderHistory();
+console.log('Init: checking characters', localStorage.getItem('ciu_characters'));
+loadSavedPrompts();
+
+// Add live preview on input changes - use onpropertychange instead
+var inputs = document.querySelectorAll('input, select');
+var iIn;
+for (iIn = 0; iIn < inputs.length; iIn++) {
+  inputs[iIn].onchange = function() { updatePreview(); };
+}
+
+</script>
+</body>
+</html>

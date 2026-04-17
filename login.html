@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>C.I.U. Login</title>
+  <style>
+    body{
+      margin:0;
+      font-family:Arial,sans-serif;
+      background:#0a0a0f;
+      color:#fff;
+      height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+    .box{
+      width:100%;
+      max-width:360px;
+      padding:24px;
+      border:1px solid #2a2a40;
+      border-radius:12px;
+      background:#141421;
+      text-align:center;
+    }
+    input{
+      width:100%;
+      box-sizing:border-box;
+      padding:12px;
+      margin-top:12px;
+      border-radius:8px;
+      border:1px solid #2a2a40;
+      background:#0a0a0f;
+      color:#fff;
+      font-size:16px;
+    }
+    button{
+      width:100%;
+      margin-top:12px;
+      padding:12px;
+      border:0;
+      border-radius:8px;
+      background:#7c5cff;
+      color:#fff;
+      font-size:16px;
+      cursor:pointer;
+    }
+    p{
+      margin:12px 0 0;
+      font-size:14px;
+      color:#a0a0b8;
+    }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <h1>C.I.U. Studio</h1>
+    <p>Digite a senha para acessar</p>
+    <input id="pwd" type="password" placeholder="Senha">
+    <button onclick="go()">Entrar</button>
+    <p id="msg"></p>
+  </div>
+
+  <script>
+    function go(){
+      const pwd = document.getElementById('pwd').value;
+      if(pwd === 'ciu2026pro'){
+        localStorage.setItem('ciu-ok','1');
+        window.location.href = '/';
+      }else{
+        document.getElementById('msg').textContent = 'Senha incorreta';
+      }
+    }
+    if(localStorage.getItem('ciu-ok') === '1'){
+      window.location.href = '/';
+    }
+  </script>
+</body>
+</html>
