@@ -481,14 +481,14 @@ body.light .nav-item:hover{background:rgba(255,255,255,0.08);color:#fff}
   <div class="sidebar-logo">
     <div class="logo-icon">🎬</div>
     <div>
-      <div class="logo-text">C.I.U. STUDIO</div>
-      <div class="logo-sub">v11 Ultimate</div>
+      <div class="logo-text">CIU STUDIO</div>
+      <div class="logo-sub">v10.2 Ultimate</div>
     </div>
   </div>
-
+  
   <div class="sidebar-nav">
     <div class="sidebar-section">Principal</div>
-
+    
     <div class="nav-item active" id="nav-overview" onclick="selectView('overview')">
       <span class="nav-dot"></span>
       📖 Visão Geral
@@ -503,7 +503,7 @@ body.light .nav-item:hover{background:rgba(255,255,255,0.08);color:#fff}
       📚 Tutorial — 10 Camadas
     </div>
   </div>
-
+  
   <div class="sidebar-footer">
     <div class="sidebar-api-pill" onclick="selectView('api')">
       <div class="api-dot" id="sidebarApiDot"></div>
@@ -526,16 +526,16 @@ body.light .nav-item:hover{background:rgba(255,255,255,0.08);color:#fff}
       <div class="topbar-sub">Creative Intelligence Universal</div>
     </div>
     <div class="topbar-spacer"></div>
-
+    
     <!-- Hidden badge for JS compatibility -->
     <span class="badge" id="apiBadge">🟡 Gemini Ativo</span>
-
+    
     <!-- Visible pill indicator -->
     <div class="topbar-pill gemini" id="topbarPill" onclick="selectView('api')">
       <span id="pillDot">🟡</span>
       <span id="pillLabel">Gemini Ativo</span>
     </div>
-
+    
     <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
   </div>
 
@@ -545,7 +545,7 @@ body.light .nav-item:hover{background:rgba(255,255,255,0.08);color:#fff}
       <h2>📖 Visão Geral</h2>
       <p>Dashboard do sistema C.I.U. — status, atividade recente e métricas.</p>
     </div>
-
+    
     <!-- Stats Row -->
     <div class="stats-grid" id="overviewStats">
       <div class="stat-card stat-accent">
@@ -573,9 +573,9 @@ body.light .nav-item:hover{background:rgba(255,255,255,0.08);color:#fff}
         <div class="stat-sub">Perfis no navegador</div>
       </div>
     </div>
-
+    
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;flex-wrap:wrap" id="overviewRow">
-
+      
       <!-- Activity / History -->
       <div class="section-card">
         <div class="section-card-title"><span class="title-icon">🕒</span> Atividade Recente</div>
@@ -583,7 +583,7 @@ body.light .nav-item:hover{background:rgba(255,255,255,0.08);color:#fff}
           <div class="activity-empty">Nenhuma geração ainda.<br><span style="color:var(--accent);cursor:pointer" onclick="selectView('producao')">→ Criar primeiro roteiro</span></div>
         </div>
       </div>
-
+      
       <!-- Saved Characters -->
       <div class="section-card">
         <div class="section-card-title"><span class="title-icon">🎭</span> Personagens Salvos</div>
@@ -592,7 +592,7 @@ body.light .nav-item:hover{background:rgba(255,255,255,0.08);color:#fff}
         </div>
       </div>
     </div>
-
+    
     <!-- Layer 6 Metrics -->
     <div class="section-card" style="margin-top:18px">
       <div class="section-card-title"><span class="title-icon">💰</span> Economia Criativa — Camada 6 (Última Geração)</div>
@@ -603,7 +603,7 @@ body.light .nav-item:hover{background:rgba(255,255,255,0.08);color:#fff}
         <div class="metric-mini-item"><div class="metric-mini-val">—</div><div class="metric-mini-label">Originalidade</div></div>
       </div>
     </div>
-
+    
     <!-- Orchestrator Status -->
     <div class="section-card" style="margin-top:18px">
       <div class="section-card-title"><span class="title-icon">🎭</span> Status Multi-LLM — Orquestrador (Camada 5)</div>
@@ -619,7 +619,7 @@ body.light .nav-item:hover{background:rgba(255,255,255,0.08);color:#fff}
       <h2>🎬 Produção Cinematográfica</h2>
       <p>Configure os parâmetros do roteiro e acione o orquestrador Multi-LLM.</p>
     </div>
-
+    
     <!-- HIDDEN selects (mantidos para compatibilidade com JS) -->
     <select id="emocaoDominante" class="hidden-select">
       <option value="esperança">Esperança</option>
@@ -645,7 +645,7 @@ body.light .nav-item:hover{background:rgba(255,255,255,0.08);color:#fff}
       <option value="romance">Romance</option>
       <option value="sci-fi">Ficção Científica</option>
     </select>
-
+    
     <!-- SECTION: Tom Cinemático -->
     <div class="section-card">
       <div class="section-card-title"><span class="title-icon">🎭</span> Tom Cinemático</div>
@@ -672,7 +672,7 @@ body.light .nav-item:hover{background:rgba(255,255,255,0.08);color:#fff}
         </div>
       </div>
     </div>
-
+    
     <!-- SECTION: Emoção Dominante -->
     <div class="section-card">
       <div class="section-card-title"><span class="title-icon">💫</span> Emoção Dominante</div>
@@ -714,7 +714,7 @@ body.light .nav-item:hover{background:rgba(255,255,255,0.08);color:#fff}
         </div>
       </div>
     </div>
-
+    
     <!-- SECTION: Templates -->
     <div class="section-card">
       <div class="section-card-title"><span class="title-icon">📋</span> Templates de Roteiro</div>
@@ -751,7 +751,7 @@ body.light .nav-item:hover{background:rgba(255,255,255,0.08);color:#fff}
         </div>
       </div>
     </div>
-
+    
     <!-- SECTION: Parâmetros -->
     <div class="section-card">
       <div class="section-card-title"><span class="title-icon">⚙️</span> Parâmetros de Geração</div>
@@ -809,7 +809,7 @@ body.light .nav-item:hover{background:rgba(255,255,255,0.08);color:#fff}
         </div>
       </div>
     </div>
-
+    
     <!-- SECTION: Personagem -->
     <div class="section-card">
       <div class="section-card-title"><span class="title-icon">🎭</span> Personagem Principal</div>
@@ -835,14 +835,14 @@ body.light .nav-item:hover{background:rgba(255,255,255,0.08);color:#fff}
           <textarea id="background" placeholder="Ex: Ex-cantor country de Austin, Texas..."></textarea>
         </div>
       </div>
-
+      
       <!-- Personagens Adicionais -->
       <div style="margin-top:12px">
         <div class="section-card-title" style="margin-bottom:8px"><span class="title-icon">👥</span> Personagens Adicionais</div>
         <div id="extraCharacters"></div>
         <button class="small-btn" onclick="addExtraCharacter()" style="margin-top:6px">+ Adicionar personagem</button>
       </div>
-
+      
       <!-- Salvar / Carregar Personagem -->
       <div style="margin-top:14px;display:flex;gap:10px;align-items:center;flex-wrap:wrap">
         <select id="savedCharacter" style="flex:1;min-width:160px;padding:8px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:0.82rem;font-family:Inter,sans-serif">
@@ -852,7 +852,7 @@ body.light .nav-item:hover{background:rgba(255,255,255,0.08);color:#fff}
         <button class="small-btn purple" onclick="saveCharacter()">💾 Salvar Personagem</button>
       </div>
     </div>
-
+    
     <!-- SECTION: Extras -->
     <div class="section-card">
       <div class="section-card-title"><span class="title-icon">🔧</span> Configurações Extras</div>
@@ -886,13 +886,13 @@ body.light .nav-item:hover{background:rgba(255,255,255,0.08);color:#fff}
         </div>
       </div>
     </div>
-
+    
     <!-- PREVIEW -->
     <div class="preview-panel" id="previewPanel">
       <div class="preview-label">Preview em tempo real</div>
       <div id="previewContent"></div>
     </div>
-
+    
     <!-- GENERATE BUTTON -->
     <div class="generate-wrap">
       <button class="generate-btn" id="generateBtn" onclick="generateScript()">
@@ -907,7 +907,7 @@ body.light .nav-item:hover{background:rgba(255,255,255,0.08);color:#fff}
     <div class="progress-bar" id="progressBar" style="display:none">
       <div class="progress" id="progressFill" style="width:0%"></div>
     </div>
-
+    
     <!-- OUTPUT AREA -->
     <div class="output-area" id="outputArea">
       <div class="output-tabs" id="outputTabs">
@@ -924,33 +924,33 @@ body.light .nav-item:hover{background:rgba(255,255,255,0.08);color:#fff}
         <button class="output-btn" onclick="downloadOutput('json')">📦 Download JSON</button>
       </div>
     </div>
-
+    
     <!-- POST-GENERATION PANELS -->
     <section class="section-card" id="emotionChartPanel" style="display:none;margin-top:18px">
       <div class="section-card-title"><span class="title-icon">📈</span> Curva Emocional — Camada 1</div>
       <div class="emotion-chart" id="emotionChart"></div>
     </section>
-
+    
     <section class="section-card" id="analysisPanel" style="display:none;margin-top:18px">
       <div class="section-card-title"><span class="title-icon">🔍</span> Análises e Validações</div>
       <div id="analysisContent" style="font-size:0.82rem"></div>
     </section>
-
+    
     <section class="section-card" id="economyPanel" style="display:none;margin-top:18px">
       <div class="section-card-title"><span class="title-icon">💰</span> Economia Criativa — Camada 6</div>
       <div id="economyMetrics"></div>
     </section>
-
+    
     <section class="section-card" id="metacogPanel" style="display:none;margin-top:18px">
       <div class="section-card-title"><span class="title-icon">🧠</span> Aprendizado Metacognitivo — Camada 10</div>
       <div id="metacogContent" style="font-size:0.82rem"></div>
     </section>
-
+    
     <section class="section-card" id="orchestratorPanel" style="display:none;margin-top:18px">
       <div class="section-card-title"><span class="title-icon">🎭</span> Orquestrador Multi-LLM — Camada 5</div>
       <div id="orchestratorStatus"></div>
     </section>
-
+    
     <!-- HISTORY (hidden panel, kept for JS compatibility) -->
     <div style="display:none">
       <div id="historyPanel" class="history-panel"></div>
@@ -963,7 +963,7 @@ body.light .nav-item:hover{background:rgba(255,255,255,0.08);color:#fff}
       <h2>📚 Tutorial — Manual das 10 Camadas</h2>
       <p>Referência completa do sistema C.I.U. Level 10 Ultimate.</p>
     </div>
-
+    
     <div class="section-card">
       <div class="tutorial-section">
         <h3>🔧 APIs Disponíveis</h3>
@@ -978,7 +978,7 @@ body.light .nav-item:hover{background:rgba(255,255,255,0.08);color:#fff}
         <p><strong>Router:</strong> Testa automaticamente todas as APIs até uma funcionar — ideal para alta disponibilidade.</p>
       </div>
     </div>
-
+    
     <div class="section-card">
       <div class="tutorial-section">
         <h3>🧠 As 10 Camadas</h3>
@@ -1036,7 +1036,7 @@ body.light .nav-item:hover{background:rgba(255,255,255,0.08);color:#fff}
         </div>
       </div>
     </div>
-
+    
     <div class="section-card">
       <div class="tutorial-section">
         <h3>⚡ Atalhos do Teclado</h3>
@@ -1060,7 +1060,7 @@ body.light .nav-item:hover{background:rgba(255,255,255,0.08);color:#fff}
         </div>
       </div>
     </div>
-
+    
     <div class="section-card">
       <div class="tutorial-section">
         <h3>📊 Campos de Saída</h3>
@@ -1079,7 +1079,7 @@ body.light .nav-item:hover{background:rgba(255,255,255,0.08);color:#fff}
       <h2>🔑 Conexões de API</h2>
       <p>Configure suas chaves de acesso. Salvas localmente no navegador — nunca enviadas a servidores externos.</p>
     </div>
-
+    
     <div class="section-card">
       <div class="api-tabs-row" id="apiTabs">
         <div class="api-tab active" data-api="gemini" onclick="selectAPI('gemini')">🟡 Gemini</div>
@@ -1088,7 +1088,7 @@ body.light .nav-item:hover{background:rgba(255,255,255,0.08);color:#fff}
         <div class="api-tab" data-api="mistral" onclick="selectAPI('mistral')">🔷 Mistral</div>
         <div class="api-tab" data-api="router" onclick="selectAPI('router')">🔀 Router</div>
       </div>
-
+      
       <div class="api-config-box">
         <div class="api-config-row" id="apiConfig">
           <div class="field">
@@ -1101,17 +1101,17 @@ body.light .nav-item:hover{background:rgba(255,255,255,0.08);color:#fff}
           </div>
         </div>
         <div id="routerStatus" style="display:none;margin-top:10px"></div>
-
+        
         <div class="api-info-box" id="apiInfoBox">
           <span id="apiInfoText">Obter chave: <a href="https://aistudio.google.com/app/apikey" target="_blank">aistudio.google.com/app/apikey</a> — 1000 requisições/min grátis. Modelo recomendado: gemini-2.5-flash.</span>
         </div>
       </div>
     </div>
-
+    
     <div class="section-card" style="margin-top:18px">
       <div class="section-card-title"><span class="title-icon">🔒</span> Segurança</div>
       <p style="font-size:0.82rem;color:var(--text2);line-height:1.75">
-        Todas as chaves de API são armazenadas <strong>exclusivamente no localStorage</strong> do seu navegador.
+        Todas as chaves de API são armazenadas <strong>exclusivamente no localStorage</strong> do seu navegador. 
         O CIU Studio opera 100% offline — nenhum dado sai do seu dispositivo exceto as chamadas diretas às APIs configuradas.
         Você pode revogar ou atualizar qualquer chave a qualquer momento nesta página.
       </p>
@@ -1189,7 +1189,7 @@ function selectTemplate(templateId, cardEl) {
 function syncCardVisuals() {
   var tomVal = document.getElementById('tomCinematografico').value;
   var emocaoVal = document.getElementById('emocaoDominante').value;
-
+  
   var tomCards = document.querySelectorAll('#tomCards .card-option');
   var i;
   for (i = 0; i < tomCards.length; i++) {
@@ -1200,7 +1200,7 @@ function syncCardVisuals() {
       tomCards[i].classList.remove('selected');
     }
   }
-
+  
   var emocaoCards = document.querySelectorAll('#emocaoCards .card-option');
   for (i = 0; i < emocaoCards.length; i++) {
     var onclickE = emocaoCards[i].getAttribute('onclick');
@@ -1238,9 +1238,9 @@ function updateTopbarPill() {
   var pillLabel = document.getElementById('pillLabel');
   var pillDot = document.getElementById('pillDot');
   var sidebarLabel = document.getElementById('sidebarApiLabel');
-
+  
   if (!pill) return;
-
+  
   pill.className = 'topbar-pill';
   if (demo) {
     pill.classList.add('demo');
@@ -1269,14 +1269,14 @@ function selectAPI(api) {
     }
     var cfg = APIs[api];
     if (!cfg) { console.error('API config not found:', api); return; }
-
+    
     // Update hidden badge (JS compatibility)
     var badge = document.getElementById('apiBadge');
     if (badge) {
       badge.textContent = cfg.badge;
       badge.className = 'badge ' + cfg.badgeClass;
     }
-
+    
     var keyLabel = document.getElementById('keyLabel');
     var keyInput = document.getElementById('apiKeyInput');
     var modelField = document.getElementById('modelField');
@@ -1284,9 +1284,9 @@ function selectAPI(api) {
     var routerStatus = document.getElementById('routerStatus');
     var apiInfoBox = document.getElementById('apiInfoBox');
     var apiInfoText = document.getElementById('apiInfoText');
-
+    
     if (apiInfoText && cfg.info) apiInfoText.innerHTML = cfg.info;
-
+    
     if (api === 'router') {
       if (keyLabel) keyLabel.textContent = 'Router Automatico';
       if (keyInput) keyInput.style.display = 'none';
@@ -1305,7 +1305,7 @@ function selectAPI(api) {
       if (saved && modelSelect) modelSelect.value = saved;
       if (routerStatus) routerStatus.style.display = 'none';
     }
-
+    
     updateTopbarPill();
     refreshOverviewApiStats();
   } catch(err) {
@@ -1804,6 +1804,8 @@ function renderMetacognitive() {
   document.getElementById('metacogPanel').style.display = 'block';
 }
 
+var var_text2 = '#7b91b0';
+
 // ===== ANALYSIS =====
 function renderAnalysis() {
   var text = outputData[0] || '';
@@ -1834,8 +1836,6 @@ function renderAnalysis() {
   document.getElementById('analysisContent').innerHTML = content;
   document.getElementById('analysisPanel').style.display = 'block';
 }
-
-var var_text2 = '#7b91b0';
 
 // ===== PREVIEW =====
 function updatePreview() {
@@ -2131,7 +2131,7 @@ async function generateScript() {
   };
   var systemPrompt = getSystemPrompt(params);
   var userPrompt = 'Gere um roteiro cinematografico completo em ' + params.idioma + ' SOMENTE.\n\nEspecificacoes:\n- Idioma: ' + params.idioma + ' — TODO o texto em ' + (params.idioma === 'en-US' ? 'INGLES americano' : params.idioma) + '\n- Duracao: ' + params.duracao + ' minutos (' + params.blocos + ' blocos)\n- Tom: ' + params.tom + '\n- Emocao: ' + params.emocao + '\n- Velocidade: ' + params.velocidade + '\n- Densidade: ' + params.densidade + '\n- Objetivo: ' + params.objetivo + '\n- Pais: ' + params.pais + '\n\nPersonagem: ' + params.nomePersonagem + '\n- Visual: ' + params.descVisual + '\n- Psicologia: ' + params.psicologia + '\n- Background: ' + params.background + '\n- Instrucoes visuais: ' + params.instrucoesVisuais + '\n\nRETORNE NAS 5 SECOES OBRIGATORIAS. Ative TODAS as 10 camadas do C.I.U. Level 10.';
-
+  
   var isDemo = document.getElementById('demoMode').checked;
   var abTest = document.getElementById('abTestMode').checked;
   btn.disabled = true;
@@ -2148,7 +2148,7 @@ async function generateScript() {
     toast('Gerando roteiro...', 'info');
     progressFill.style.width = '30%';
     if (abTest) toast('Gerando versao A...', 'info');
-
+    
     if (isDemo) {
       result = generateDemoOutput(params);
       outputData = parseOutput(result);
@@ -2165,6 +2165,8 @@ async function generateScript() {
       var prompt = { system: systemPrompt, user: userPrompt };
       if (currentAPI === 'router') {
         result = await callRouter(prompt);
+        outputData = parseOutput(result);
+        results.push({ output: outputData, version: 'A' });
       } else {
         var key = localStorage.getItem(APIs[currentAPI].keyStore);
         if (!key) throw new Error('Configure sua chave de API primeiro (vá em Conexões de API)!');
@@ -2211,47 +2213,48 @@ async function generateScript() {
         }
       }
     }
-
+    
     progressFill.style.width = '80%';
     outputData = results[0] ? results[0].output : ['','','','',''];
-
+    
     var area = document.getElementById('outputArea');
     area.style.display = 'block';
     area.classList.add('fade-in');
     switchTab(0);
     progressFill.style.width = '100%';
     setTimeout(function() { progressBar.style.display = 'none'; }, 1000);
-
+    
     addToHistory(outputData, params);
     renderEmotionChart();
     renderEconomyMetrics();
     renderMetacognitive();
     renderAnalysis();
-
+    
     var orchPanel = document.getElementById('orchestratorPanel');
+    var orchStatus = document.getElementById('orchestratorStatus');
     var usedModel = document.getElementById('modelSelect') ? document.getElementById('modelSelect').value : currentAPI;
     var usedAPI = APIs[currentAPI] ? APIs[currentAPI].label : currentAPI;
     var abLabel = abTest ? ' | Versao B: tom alternativo' : '';
-    orchPanel.innerHTML = '<div style="font-size:0.82rem;color:var(--text2);padding:4px 0">' +
+    if (orchStatus) orchStatus.innerHTML = '<div style="font-size:0.82rem;color:var(--text2);padding:4px 0">' +
       '<p>🤖 <strong style="color:var(--text)">Orquestrador Multi-LLM (Camada 5):</strong> Ativo</p>' +
       '<p style="margin-top:6px">API ativa: <strong>' + usedAPI + '</strong> — Modelo: <strong>' + usedModel + '</strong>' + abLabel + '</p>' +
       '<p style="margin-top:4px;font-size:0.75rem;color:var(--text3)">Roles injetados: Claude→Narrativa | Gemini→Cultural | Mistral→Ritmo | GPT→Voz</p>' +
       '</div>';
     orchPanel.style.display = 'block';
-
+    
     if (document.getElementById('webhookUrl').value) {
       sendWebhook({ outputs: outputData, params: params, tags: currentTags });
     }
-
+    
     if (abTest && results.length > 1) {
       toast('A/B Test concluido! Versoes A e B geradas.', 'success');
     } else {
       toast('Roteiro gerado com sucesso!', 'success');
     }
-
+    
     // Scroll to output
     area.scrollIntoView({ behavior: 'smooth', block: 'start' });
-
+    
   } catch(e) {
     toast('Erro: ' + e.message, 'error');
     console.error('Generation error:', e);
