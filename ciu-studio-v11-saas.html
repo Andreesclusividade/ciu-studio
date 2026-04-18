@@ -1,0 +1,2290 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>C.I.U. Studio — Creative Intelligence Universal</title>
+<meta name="description" content="Sistema de Inteligência Criativa Universal para geração de roteiros cinematográficos narrativos com IA.">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ===== RESET & ROOT ===== */
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --sidebar-w:240px;
+  --bg:#0b1120;
+  --bg2:#111827;
+  --bg3:#1a2235;
+  --bg4:#222d42;
+  --border:#1e2d45;
+  --border2:#253350;
+  --text:#e2e8f0;
+  --text2:#7b91b0;
+  --text3:#4a6080;
+  --accent:#3d7eff;
+  --accent2:#6c47ff;
+  --accent3:#a855f7;
+  --gemini:#facc15;
+  --claude:#a855f7;
+  --gpt:#22c55e;
+  --router:#3b82f6;
+  --mistral:#8b5cf6;
+  --glass:rgba(255,255,255,0.03);
+  --glass2:rgba(255,255,255,0.06);
+  --radius:10px;
+  --radius-lg:14px;
+  --shadow:0 4px 24px rgba(0,0,0,0.5);
+  --shadow-sm:0 2px 10px rgba(0,0,0,0.3);
+  --sidebar-bg:#070d1a;
+  --topbar-h:60px;
+  --success:#22c55e;
+  --danger:#ef4444;
+  --warn:#f59e0b;
+}
+html{height:100%}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;display:flex}
+
+/* ===== SIDEBAR ===== */
+#sidebar{
+  width:var(--sidebar-w);
+  min-height:100vh;
+  background:var(--sidebar-bg);
+  border-right:1px solid rgba(255,255,255,0.05);
+  position:fixed;
+  top:0;left:0;bottom:0;
+  display:flex;flex-direction:column;
+  z-index:200;
+  transition:width .3s;
+}
+.sidebar-logo{
+  padding:20px 18px 16px;
+  display:flex;align-items:center;gap:10px;
+  border-bottom:1px solid rgba(255,255,255,0.06);
+}
+.sidebar-logo .logo-icon{
+  width:34px;height:34px;border-radius:9px;
+  background:linear-gradient(135deg,#3d7eff,#6c47ff);
+  display:flex;align-items:center;justify-content:center;
+  font-size:1rem;flex-shrink:0;
+  box-shadow:0 0 18px rgba(61,126,255,0.35);
+}
+.sidebar-logo .logo-text{font-size:0.85rem;font-weight:700;color:var(--text);letter-spacing:0.5px;line-height:1.2}
+.sidebar-logo .logo-sub{font-size:0.65rem;color:var(--text3);letter-spacing:1px;text-transform:uppercase}
+
+.sidebar-section{padding:12px 10px 4px;font-size:0.6rem;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:1.5px}
+
+.sidebar-nav{flex:1;padding:8px 10px;overflow-y:auto}
+.nav-item{
+  display:flex;align-items:center;gap:10px;
+  padding:9px 12px;border-radius:8px;
+  font-size:0.82rem;font-weight:500;color:var(--text2);
+  cursor:pointer;transition:all .2s;margin-bottom:2px;
+  user-select:none;
+}
+.nav-item:hover{background:var(--glass2);color:var(--text)}
+.nav-item.active{background:rgba(61,126,255,0.12);color:#3d7eff;font-weight:600}
+.nav-item.active .nav-dot{background:#3d7eff;box-shadow:0 0 6px rgba(61,126,255,0.6)}
+.nav-dot{width:5px;height:5px;border-radius:50%;background:var(--text3);flex-shrink:0;transition:all .2s}
+.nav-badge{
+  margin-left:auto;font-size:0.6rem;font-weight:700;
+  padding:2px 7px;border-radius:10px;
+  background:rgba(61,126,255,0.2);color:#3d7eff;
+}
+
+.sidebar-footer{padding:12px 10px;border-top:1px solid rgba(255,255,255,0.05)}
+.sidebar-api-pill{
+  display:flex;align-items:center;gap:8px;
+  padding:10px 12px;border-radius:8px;
+  background:var(--bg3);border:1px solid var(--border);
+  font-size:0.75rem;cursor:pointer;transition:all .2s;margin-bottom:8px;
+}
+.sidebar-api-pill:hover{border-color:var(--accent)}
+.api-dot{width:7px;height:7px;border-radius:50%;background:#facc15;box-shadow:0 0 5px #facc15;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.5}}
+
+/* ===== MAIN AREA ===== */
+#mainArea{
+  margin-left:var(--sidebar-w);
+  flex:1;min-height:100vh;
+  display:flex;flex-direction:column;
+  background:var(--bg);
+}
+
+/* ===== TOP BAR ===== */
+#topBar{
+  height:var(--topbar-h);
+  background:var(--bg);
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;
+  padding:0 28px;gap:14px;
+  position:sticky;top:0;z-index:100;
+  backdrop-filter:blur(12px);
+}
+.topbar-title{font-size:0.9rem;font-weight:600;color:var(--text)}
+.topbar-sub{font-size:0.75rem;color:var(--text2);margin-left:2px}
+.topbar-spacer{flex:1}
+.topbar-pill{
+  display:inline-flex;align-items:center;gap:7px;
+  padding:6px 14px;border-radius:20px;font-size:0.75rem;font-weight:600;
+  border:1px solid;white-space:nowrap;cursor:pointer;transition:all .2s;
+}
+.topbar-pill.gemini{background:rgba(250,204,21,0.1);color:#facc15;border-color:rgba(250,204,21,0.3)}
+.topbar-pill.claude{background:rgba(168,85,247,0.1);color:#a855f7;border-color:rgba(168,85,247,0.3)}
+.topbar-pill.gpt{background:rgba(34,197,94,0.1);color:#22c55e;border-color:rgba(34,197,94,0.3)}
+.topbar-pill.router{background:rgba(59,130,246,0.1);color:#3b82f6;border-color:rgba(59,130,246,0.3)}
+.topbar-pill.mistral{background:rgba(139,92,246,0.1);color:#8b5cf6;border-color:rgba(139,92,246,0.3)}
+.topbar-pill.demo{background:rgba(245,158,11,0.1);color:#f59e0b;border-color:rgba(245,158,11,0.3)}
+
+.theme-toggle{
+  padding:6px 10px;background:var(--bg3);border:1px solid var(--border);
+  border-radius:8px;cursor:pointer;font-size:0.8rem;color:var(--text2);
+  transition:all .2s;
+}
+.theme-toggle:hover{border-color:var(--accent);color:var(--text)}
+
+/* ===== VIEW WRAPPER ===== */
+.view{display:none;padding:28px;animation:fadeIn .3s ease}
+.view.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* ===== PAGE HEADERS ===== */
+.page-header{margin-bottom:24px}
+.page-header h2{font-size:1.35rem;font-weight:700;color:var(--text);display:flex;align-items:center;gap:10px}
+.page-header p{font-size:0.82rem;color:var(--text2);margin-top:5px}
+
+/* ===== STATS GRID ===== */
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:24px}
+.stat-card{
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:var(--radius-lg);padding:18px 20px;
+  transition:border-color .2s;
+}
+.stat-card:hover{border-color:var(--border2)}
+.stat-card .stat-label{font-size:0.7rem;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px}
+.stat-card .stat-value{font-size:1.6rem;font-weight:800;color:var(--text);line-height:1}
+.stat-card .stat-sub{font-size:0.72rem;color:var(--text2);margin-top:5px}
+.stat-card .stat-icon{font-size:1.2rem;margin-bottom:8px}
+.stat-accent{border-left:3px solid var(--accent)}
+
+/* ===== SECTION CARDS ===== */
+.section-card{
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:var(--radius-lg);padding:22px;margin-bottom:18px;
+}
+.section-card-title{
+  font-size:0.82rem;font-weight:700;color:var(--text2);
+  text-transform:uppercase;letter-spacing:1px;
+  margin-bottom:16px;display:flex;align-items:center;gap:8px;
+}
+.section-card-title .title-icon{font-size:1rem}
+
+/* ===== ACTIVITY LIST ===== */
+.activity-item{
+  display:flex;align-items:center;gap:12px;
+  padding:10px 0;border-bottom:1px solid var(--border);
+  transition:all .2s;cursor:pointer;
+}
+.activity-item:last-child{border-bottom:none}
+.activity-item:hover .activity-name{color:var(--accent)}
+.activity-avatar{
+  width:34px;height:34px;border-radius:8px;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  display:flex;align-items:center;justify-content:center;
+  font-size:0.85rem;font-weight:700;color:#fff;flex-shrink:0;
+}
+.activity-name{font-size:0.82rem;font-weight:600;color:var(--text)}
+.activity-meta{font-size:0.72rem;color:var(--text2)}
+.activity-date{margin-left:auto;font-size:0.7rem;color:var(--text3);white-space:nowrap}
+.activity-empty{text-align:center;padding:30px;color:var(--text3);font-size:0.82rem}
+
+/* ===== CHARACTER CARDS ===== */
+.char-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px}
+.char-card{
+  background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);
+  padding:14px;transition:all .2s;cursor:pointer;
+}
+.char-card:hover{border-color:var(--accent);transform:translateY(-1px)}
+.char-card .char-name{font-size:0.82rem;font-weight:700;color:var(--text);margin-bottom:4px}
+.char-card .char-desc{font-size:0.7rem;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* ===== ORCHESTRATOR STATUS ===== */
+.orch-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.orch-item{
+  background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);
+  padding:12px;display:flex;align-items:center;gap:10px;
+}
+.orch-status-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.orch-status-dot.ok{background:#22c55e;box-shadow:0 0 5px #22c55e}
+.orch-status-dot.miss{background:#4a6080}
+.orch-name{font-size:0.8rem;font-weight:600;color:var(--text)}
+.orch-sub{font-size:0.68rem;color:var(--text2)}
+
+/* ===== METRICS MINI ===== */
+.metrics-mini{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.metric-mini-item{background:var(--bg3);border-radius:var(--radius);padding:10px 12px;text-align:center}
+.metric-mini-val{font-size:1.2rem;font-weight:800;color:var(--accent)}
+.metric-mini-label{font-size:0.65rem;color:var(--text3);text-transform:uppercase;margin-top:3px;letter-spacing:0.5px}
+
+/* ===== PRODUCTION FORM ===== */
+.prod-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+.form-group{display:flex;flex-direction:column;gap:6px}
+.form-group label{font-size:0.7rem;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:1px}
+.form-group input,.form-group select,.form-group textarea{
+  width:100%;padding:9px 13px;background:var(--bg3);
+  border:1px solid var(--border);border-radius:8px;
+  color:var(--text);font-size:0.88rem;font-family:'Inter',sans-serif;
+  transition:all .2s;
+}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{
+  outline:none;border-color:var(--accent);
+  box-shadow:0 0 0 3px rgba(61,126,255,0.12);
+}
+.form-group select{cursor:pointer;appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%237b91b0'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 12px center;padding-right:32px;
+}
+.form-group textarea{resize:vertical;min-height:80px;line-height:1.6}
+.form-group.full{grid-column:1/-1}
+.hidden-select{display:none}
+
+/* ===== CARD OPTION GROUPS ===== */
+.card-group-label{font-size:0.7rem;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px}
+.cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:8px;margin-bottom:20px}
+.cards-grid-sm{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px;margin-bottom:20px}
+.card-option{
+  background:var(--bg3);border:1.5px solid var(--border);border-radius:10px;
+  padding:12px;cursor:pointer;transition:all .2s;user-select:none;
+}
+.card-option:hover{border-color:var(--border2);background:var(--bg4)}
+.card-option.selected{
+  border-color:var(--accent);background:rgba(61,126,255,0.1);
+}
+.card-option.selected .card-opt-title{color:var(--accent)}
+.card-opt-icon{font-size:1.2rem;margin-bottom:6px}
+.card-opt-title{font-size:0.78rem;font-weight:700;color:var(--text);margin-bottom:3px}
+.card-opt-desc{font-size:0.65rem;color:var(--text2);line-height:1.4}
+
+/* ===== GENERATE BUTTON ===== */
+.generate-wrap{display:flex;align-items:center;gap:14px;margin:20px 0;flex-wrap:wrap}
+.generate-btn{
+  flex:1;min-width:240px;
+  padding:15px 28px;
+  background:linear-gradient(135deg,#3d7eff,#6c47ff);
+  border:none;border-radius:10px;color:#fff;
+  font-size:1rem;font-weight:700;cursor:pointer;
+  transition:all .3s;font-family:'Inter',sans-serif;
+  letter-spacing:0.3px;position:relative;overflow:hidden;
+  box-shadow:0 4px 20px rgba(61,126,255,0.3);
+}
+.generate-btn::after{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(255,255,255,0.1),transparent);
+  opacity:0;transition:opacity .2s;
+}
+.generate-btn:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(61,126,255,0.45)}
+.generate-btn:hover::after{opacity:1}
+.generate-btn:active{transform:translateY(0)}
+.generate-btn:disabled{opacity:0.55;cursor:not-allowed;transform:none}
+.generate-btn .spinner{display:none;width:20px;height:20px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto}
+@keyframes spin{to{transform:rotate(360deg)}}
+.gen-cost{font-size:0.75rem;color:var(--text2);line-height:1.5}
+.gen-cost strong{color:var(--text)}
+
+/* ===== PROGRESS ===== */
+.progress-bar{height:3px;background:var(--border);border-radius:2px;overflow:hidden;margin-top:8px}
+.progress-bar .progress{height:100%;background:linear-gradient(90deg,#3d7eff,#6c47ff,#a855f7);transition:width .3s ease;border-radius:2px}
+
+/* ===== OUTPUT AREA ===== */
+.output-area{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);margin-top:20px;overflow:hidden;display:none}
+.output-tabs{display:flex;border-bottom:1px solid var(--border);overflow-x:auto;gap:0;padding:0 6px}
+.output-tab{
+  padding:12px 20px;font-size:0.8rem;font-weight:600;color:var(--text2);
+  cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;
+  white-space:nowrap;flex-shrink:0;
+}
+.output-tab:hover{color:var(--text)}
+.output-tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+.output-content{padding:24px;min-height:280px;max-height:65vh;overflow-y:auto;position:relative}
+.output-content pre{font-family:'JetBrains Mono',monospace;font-size:0.82rem;line-height:1.8;white-space:pre-wrap;color:var(--text)}
+.output-content .narrative{font-size:0.92rem;line-height:1.95;color:var(--text)}
+.output-content .narrative p{margin-bottom:14px}
+.output-actions{
+  display:flex;gap:8px;padding:12px 20px;
+  border-top:1px solid var(--border);background:var(--bg3);
+  flex-wrap:wrap;
+}
+.output-btn{
+  padding:7px 14px;background:var(--bg2);border:1px solid var(--border);
+  border-radius:7px;cursor:pointer;font-size:0.75rem;font-weight:600;color:var(--text2);
+  transition:all .2s;
+}
+.output-btn:hover{background:var(--accent);color:#fff;border-color:var(--accent)}
+.router-info{
+  display:inline-flex;align-items:center;gap:6px;padding:4px 12px;
+  border-radius:6px;font-size:0.72rem;background:rgba(59,130,246,0.1);
+  color:var(--router);border:1px solid rgba(59,130,246,0.2);margin-bottom:12px;
+}
+
+/* ===== ANALYSIS PANELS ===== */
+.analysis-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-top:14px}
+.mini-card{background:var(--bg3);border-radius:var(--radius);padding:12px}
+.mini-card-label{font-size:0.65rem;color:var(--text3);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:6px}
+.mini-card-val{font-size:1.15rem;font-weight:800;color:var(--accent)}
+
+/* ===== EMOTION CHART ===== */
+.emotion-chart{display:flex;align-items:flex-end;gap:10px;height:70px;padding:10px 0}
+.emotion-bar{flex:1;background:linear-gradient(180deg,var(--accent),var(--accent2));border-radius:5px 5px 0 0;transition:height .5s ease;position:relative;min-width:20px}
+.emotion-bar::after{content:attr(data-value);position:absolute;top:-18px;left:50%;transform:translateX(-50%);font-size:0.62rem;color:var(--text2);white-space:nowrap}
+
+/* ===== API VIEW ===== */
+.api-tabs-row{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap}
+.api-tab{
+  padding:9px 18px;border-radius:9px;border:1px solid var(--border);
+  background:var(--glass);cursor:pointer;font-size:0.82rem;font-weight:600;
+  color:var(--text2);transition:all .25s;display:flex;align-items:center;gap:7px;
+}
+.api-tab:hover{border-color:var(--border2);color:var(--text)}
+.api-tab.active{background:rgba(61,126,255,0.12);border-color:var(--accent);color:var(--text)}
+.api-tab[data-api="gemini"].active{border-color:var(--gemini);background:rgba(250,204,21,0.08);color:var(--gemini)}
+.api-tab[data-api="claude"].active{border-color:var(--claude);background:rgba(168,85,247,0.08);color:var(--claude)}
+.api-tab[data-api="gpt"].active{border-color:var(--gpt);background:rgba(34,197,94,0.08);color:var(--gpt)}
+.api-tab[data-api="router"].active{border-color:var(--router);background:rgba(59,130,246,0.08);color:var(--router)}
+.api-tab[data-api="mistral"].active{border-color:var(--mistral);background:rgba(139,92,246,0.08);color:var(--mistral)}
+
+.api-config-box{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px}
+.api-config-row{display:flex;gap:14px;align-items:end;flex-wrap:wrap}
+.api-config-row .field{flex:1;min-width:220px}
+.api-config-row label{display:block;font-size:0.7rem;color:var(--text3);margin-bottom:6px;font-weight:600;text-transform:uppercase;letter-spacing:1px}
+.api-config-row input,.api-config-row select{
+  width:100%;padding:9px 13px;background:var(--bg);border:1px solid var(--border);
+  border-radius:8px;color:var(--text);font-size:0.88rem;font-family:'Inter',sans-serif;
+  transition:border-color .2s;
+}
+.api-config-row input:focus,.api-config-row select:focus{outline:none;border-color:var(--accent)}
+.masked-input{font-family:monospace;letter-spacing:2px}
+#routerStatus{margin-top:12px}
+
+.router-status-grid{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.router-status-item{
+  display:flex;align-items:center;gap:6px;padding:6px 12px;
+  border-radius:6px;font-size:0.75rem;font-weight:600;
+}
+.router-status-item.ok{background:rgba(34,197,94,0.1);color:#22c55e;border:1px solid rgba(34,197,94,0.25)}
+.router-status-item.miss{background:rgba(74,96,128,0.15);color:var(--text3);border:1px solid var(--border)}
+
+.api-info-box{
+  background:rgba(61,126,255,0.06);border:1px solid rgba(61,126,255,0.2);
+  border-radius:var(--radius);padding:14px;margin-top:12px;font-size:0.8rem;color:var(--text2);line-height:1.7;
+}
+.api-info-box a{color:var(--accent);text-decoration:none}
+.api-info-box a:hover{text-decoration:underline}
+
+/* ===== TUTORIAL VIEW ===== */
+.tutorial-section{margin-bottom:28px}
+.tutorial-section h3{font-size:1rem;font-weight:700;color:var(--accent);margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.tutorial-section p{font-size:0.84rem;color:var(--text2);line-height:1.75;margin-bottom:8px}
+.tutorial-section strong{color:var(--text)}
+.layer-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px;margin-top:10px}
+.layer-item{
+  background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:14px;
+}
+.layer-num{font-size:0.65rem;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px}
+.layer-name{font-size:0.82rem;font-weight:700;color:var(--text);margin-bottom:4px}
+.layer-desc{font-size:0.72rem;color:var(--text2);line-height:1.6}
+.shortcut-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px;margin-top:10px}
+.shortcut-item{
+  background:var(--bg3);border:1px solid var(--border);border-radius:8px;
+  padding:10px 14px;display:flex;align-items:center;gap:10px;
+}
+.shortcut-key{background:var(--bg4);border:1px solid var(--border2);border-radius:5px;padding:3px 8px;font-family:'JetBrains Mono',monospace;font-size:0.72rem;color:var(--accent);flex-shrink:0}
+.shortcut-desc{font-size:0.75rem;color:var(--text2)}
+
+/* ===== MISC FORM ELEMENTS ===== */
+.tag{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;background:rgba(61,126,255,0.2);color:#3d7eff;border-radius:12px;font-size:0.7rem;margin:2px;border:1px solid rgba(61,126,255,0.3)}
+.tag-remove{cursor:pointer;opacity:0.6}
+.tag-remove:hover{opacity:1}
+.checkbox-label{display:flex;align-items:center;gap:8px;font-size:0.82rem;color:var(--text2);cursor:pointer}
+.checkbox-label input[type=checkbox]{accent-color:var(--accent);width:14px;height:14px}
+.small-btn{padding:6px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;cursor:pointer;font-size:0.75rem;color:var(--text2);font-family:'Inter',sans-serif;transition:all .2s}
+.small-btn:hover{border-color:var(--accent);color:var(--text)}
+.small-btn.green{background:rgba(34,197,94,0.1);border-color:rgba(34,197,94,0.3);color:#22c55e}
+.small-btn.purple{background:rgba(61,126,255,0.1);border-color:rgba(61,126,255,0.3);color:#3d7eff}
+
+.preview-panel{background:var(--bg3);border-radius:8px;padding:14px;margin-top:12px;font-size:0.78rem;max-height:140px;overflow-y:auto;display:none;border:1px solid var(--border)}
+.preview-label{font-size:0.65rem;color:var(--text3);text-transform:uppercase;margin-bottom:8px;letter-spacing:0.8px}
+
+.storage-item{display:flex;justify-content:space-between;align-items:center;padding:8px 10px;background:var(--bg);border-radius:6px;margin:4px 0;border:1px solid var(--border)}
+.storage-item button{padding:3px 8px;font-size:0.68rem;background:var(--glass);border:1px solid var(--border);border-radius:4px;cursor:pointer;color:var(--text2);font-family:'Inter',sans-serif}
+
+.ab-test-box{background:rgba(61,126,255,0.06);border:1.5px solid rgba(61,126,255,0.25);border-radius:var(--radius);padding:12px 16px;margin-top:8px}
+
+/* ===== TOAST ===== */
+.toast{position:fixed;bottom:28px;right:28px;padding:12px 22px;border-radius:9px;font-size:0.82rem;font-weight:600;color:#fff;z-index:9999;animation:fadeIn .3s;box-shadow:var(--shadow);max-width:340px}
+.toast.error{background:linear-gradient(135deg,#ef4444,#dc2626)}
+.toast.success{background:linear-gradient(135deg,#22c55e,#16a34a)}
+.toast.info{background:linear-gradient(135deg,#3d7eff,#2563eb)}
+
+/* ===== SCROLLBAR ===== */
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:var(--border2)}
+
+/* ===== BADGE (hidden, kept for JS compatibility) ===== */
+.badge{display:none}
+
+/* ===== HISTORY ITEM (kept for compatibility) ===== */
+.history-panel{padding:0}
+.history-item{padding:10px;border-bottom:1px solid var(--border);cursor:pointer;font-size:0.8rem}
+.history-item:hover{background:var(--glass)}
+
+/* ===== TOOLTIP ===== */
+.tooltip{position:relative}
+.tooltip::before{content:attr(data-tip);position:absolute;bottom:100%;left:50%;transform:translateX(-50%);background:#0a0a14;color:#fff;padding:6px 10px;border-radius:6px;font-size:0.7rem;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity 0.2s;z-index:100;border:1px solid var(--border)}
+.tooltip:hover::before{opacity:1}
+
+/* ===== LIGHT MODE ===== */
+body.light{--bg:#f1f5fb;--bg2:#fff;--bg3:#e9eef7;--bg4:#dde4ee;--border:#d0d9e8;--border2:#b8c4d9;--text:#1a2235;--text2:#5a6a85;--text3:#8a9ab5;--sidebar-bg:#1a2235;--glass:rgba(0,0,0,0.02);--glass2:rgba(0,0,0,0.05)}
+body.light #sidebar{border-right:1px solid rgba(0,0,0,0.08)}
+body.light .section-card,body.light .stat-card{box-shadow:0 2px 12px rgba(0,0,0,0.07)}
+body.light .nav-item{color:#8a9ab5}
+body.light .nav-item.active{color:#3d7eff}
+body.light .sidebar-logo .logo-text{color:#fff}
+body.light .sidebar-logo .logo-sub{color:rgba(255,255,255,0.45)}
+body.light .sidebar-api-pill{background:rgba(255,255,255,0.08);border-color:rgba(255,255,255,0.12);color:#a0b0cc}
+body.light .nav-item:hover{background:rgba(255,255,255,0.08);color:#fff}
+
+/* ===== RESPONSIVE ===== */
+@media(max-width:900px){
+  :root{--sidebar-w:0px}
+  #sidebar{transform:translateX(-240px);width:240px}
+  #sidebar.open{transform:translateX(0);width:240px}
+  #mainArea{margin-left:0}
+  .stats-grid{grid-template-columns:repeat(2,1fr)}
+  .metrics-mini{grid-template-columns:repeat(2,1fr)}
+  .orch-grid{grid-template-columns:1fr}
+}
+@media(max-width:600px){
+  .view{padding:16px}
+  .stats-grid{grid-template-columns:1fr 1fr}
+  .metrics-mini{grid-template-columns:repeat(2,1fr)}
+  .cards-grid{grid-template-columns:repeat(2,1fr)}
+  .prod-grid{grid-template-columns:1fr}
+  .generate-wrap{flex-direction:column}
+  .generate-btn{min-width:unset}
+}
+</style>
+</head>
+<body>
+
+<!-- ===== SIDEBAR ===== -->
+<aside id="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-icon">🎬</div>
+    <div>
+      <div class="logo-text">C.I.U. STUDIO</div>
+      <div class="logo-sub">v11 Ultimate</div>
+    </div>
+  </div>
+
+  <div class="sidebar-nav">
+    <div class="sidebar-section">Principal</div>
+
+    <div class="nav-item active" id="nav-overview" onclick="selectView('overview')">
+      <span class="nav-dot"></span>
+      📖 Visão Geral
+    </div>
+    <div class="nav-item" id="nav-producao" onclick="selectView('producao')">
+      <span class="nav-dot"></span>
+      🎬 Produção
+      <span class="nav-badge">Ctrl+G</span>
+    </div>
+    <div class="nav-item" id="nav-tutorial" onclick="selectView('tutorial')">
+      <span class="nav-dot"></span>
+      📚 Tutorial — 10 Camadas
+    </div>
+  </div>
+
+  <div class="sidebar-footer">
+    <div class="sidebar-api-pill" onclick="selectView('api')">
+      <div class="api-dot" id="sidebarApiDot"></div>
+      <span id="sidebarApiLabel">Gemini Ativo</span>
+    </div>
+    <div class="nav-item" id="nav-api" onclick="selectView('api')">
+      <span class="nav-dot"></span>
+      🔑 Conexões de API
+    </div>
+  </div>
+</aside>
+
+<!-- ===== MAIN AREA ===== -->
+<main id="mainArea">
+
+  <!-- TOP BAR -->
+  <div id="topBar">
+    <div>
+      <div class="topbar-title" id="topBarTitle">Visão Geral</div>
+      <div class="topbar-sub">Creative Intelligence Universal</div>
+    </div>
+    <div class="topbar-spacer"></div>
+
+    <!-- Hidden badge for JS compatibility -->
+    <span class="badge" id="apiBadge">🟡 Gemini Ativo</span>
+
+    <!-- Visible pill indicator -->
+    <div class="topbar-pill gemini" id="topbarPill" onclick="selectView('api')">
+      <span id="pillDot">🟡</span>
+      <span id="pillLabel">Gemini Ativo</span>
+    </div>
+
+    <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+  </div>
+
+  <!-- ===== VIEW: OVERVIEW ===== -->
+  <div class="view active" id="view-overview">
+    <div class="page-header">
+      <h2>📖 Visão Geral</h2>
+      <p>Dashboard do sistema C.I.U. — status, atividade recente e métricas.</p>
+    </div>
+
+    <!-- Stats Row -->
+    <div class="stats-grid" id="overviewStats">
+      <div class="stat-card stat-accent">
+        <div class="stat-icon">🤖</div>
+        <div class="stat-label">Orquestrador</div>
+        <div class="stat-value" id="ov-orchStatus">Ativo</div>
+        <div class="stat-sub" id="ov-orchSub">Multi-LLM — Camada 5</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">⚡</div>
+        <div class="stat-label">API Conectada</div>
+        <div class="stat-value" id="ov-apiName">Gemini</div>
+        <div class="stat-sub" id="ov-apiModel">gemini-2.5-flash</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">📜</div>
+        <div class="stat-label">Total Gerações</div>
+        <div class="stat-value" id="ov-totalGen">0</div>
+        <div class="stat-sub">Salvas no histórico local</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">🎭</div>
+        <div class="stat-label">Personagens Salvos</div>
+        <div class="stat-value" id="ov-totalChars">0</div>
+        <div class="stat-sub">Perfis no navegador</div>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;flex-wrap:wrap" id="overviewRow">
+
+      <!-- Activity / History -->
+      <div class="section-card">
+        <div class="section-card-title"><span class="title-icon">🕒</span> Atividade Recente</div>
+        <div id="ovHistoryList">
+          <div class="activity-empty">Nenhuma geração ainda.<br><span style="color:var(--accent);cursor:pointer" onclick="selectView('producao')">→ Criar primeiro roteiro</span></div>
+        </div>
+      </div>
+
+      <!-- Saved Characters -->
+      <div class="section-card">
+        <div class="section-card-title"><span class="title-icon">🎭</span> Personagens Salvos</div>
+        <div class="char-grid" id="ovCharGrid">
+          <div class="activity-empty" style="grid-column:1/-1">Nenhum personagem salvo ainda.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Layer 6 Metrics -->
+    <div class="section-card" style="margin-top:18px">
+      <div class="section-card-title"><span class="title-icon">💰</span> Economia Criativa — Camada 6 (Última Geração)</div>
+      <div class="metrics-mini" id="ovMetrics">
+        <div class="metric-mini-item"><div class="metric-mini-val">—</div><div class="metric-mini-label">CTR</div></div>
+        <div class="metric-mini-item"><div class="metric-mini-val">—</div><div class="metric-mini-label">Retenção</div></div>
+        <div class="metric-mini-item"><div class="metric-mini-val">—</div><div class="metric-mini-label">CPM</div></div>
+        <div class="metric-mini-item"><div class="metric-mini-val">—</div><div class="metric-mini-label">Originalidade</div></div>
+      </div>
+    </div>
+
+    <!-- Orchestrator Status -->
+    <div class="section-card" style="margin-top:18px">
+      <div class="section-card-title"><span class="title-icon">🎭</span> Status Multi-LLM — Orquestrador (Camada 5)</div>
+      <div class="orch-grid" id="ovOrchGrid">
+        <!-- populated by JS -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== VIEW: PRODUCAO ===== -->
+  <div class="view" id="view-producao">
+    <div class="page-header">
+      <h2>🎬 Produção Cinematográfica</h2>
+      <p>Configure os parâmetros do roteiro e acione o orquestrador Multi-LLM.</p>
+    </div>
+
+    <!-- HIDDEN selects (mantidos para compatibilidade com JS) -->
+    <select id="emocaoDominante" class="hidden-select">
+      <option value="esperança">Esperança</option>
+      <option value="esperança e redenção" selected>Esperança e Redenção</option>
+      <option value="melancolia">Melancolia</option>
+      <option value="orgulho">Orgulho</option>
+      <option value="empatia">Empatia</option>
+      <option value="tensão">Tensão</option>
+      <option value="nostalgia">Nostalgia</option>
+    </select>
+    <select id="tomCinematografico" class="hidden-select">
+      <option value="drama realista" selected>Drama Realista</option>
+      <option value="thriller psicológico">Thriller Psicológico</option>
+      <option value="documentário emocional">Documentário Emocional</option>
+      <option value="conto inspirador">Conto Inspirador</option>
+    </select>
+    <select id="scriptTemplate" class="hidden-select" onchange="loadTemplate()">
+      <option value="">--</option>
+      <option value="drama">Drama Realista</option>
+      <option value="comedia">Comédia</option>
+      <option value="acao">Ação e Aventura</option>
+      <option value="terror">Terror/Thriller</option>
+      <option value="romance">Romance</option>
+      <option value="sci-fi">Ficção Científica</option>
+    </select>
+
+    <!-- SECTION: Tom Cinemático -->
+    <div class="section-card">
+      <div class="section-card-title"><span class="title-icon">🎭</span> Tom Cinemático</div>
+      <div class="cards-grid" id="tomCards">
+        <div class="card-option selected" onclick="selectCard('tomCinematografico','drama realista',this)">
+          <div class="card-opt-icon">🎭</div>
+          <div class="card-opt-title">Drama Realista</div>
+          <div class="card-opt-desc">Foco em empatia e tensão emocional autêntica</div>
+        </div>
+        <div class="card-option" onclick="selectCard('tomCinematografico','thriller psicológico',this)">
+          <div class="card-opt-icon">🔍</div>
+          <div class="card-opt-title">Thriller Psicológico</div>
+          <div class="card-opt-desc">Suspense mental, reviravoltas e atmosfera tensa</div>
+        </div>
+        <div class="card-option" onclick="selectCard('tomCinematografico','documentário emocional',this)">
+          <div class="card-opt-icon">📹</div>
+          <div class="card-opt-title">Documentário Emocional</div>
+          <div class="card-opt-desc">Estilo real e intimista, narrativa jornalística</div>
+        </div>
+        <div class="card-option" onclick="selectCard('tomCinematografico','conto inspirador',this)">
+          <div class="card-opt-icon">✨</div>
+          <div class="card-opt-title">Conto Inspirador</div>
+          <div class="card-opt-desc">Superação, esperança e mensagem transformadora</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION: Emoção Dominante -->
+    <div class="section-card">
+      <div class="section-card-title"><span class="title-icon">💫</span> Emoção Dominante</div>
+      <div class="cards-grid" id="emocaoCards">
+        <div class="card-option" onclick="selectCard('emocaoDominante','esperança',this)">
+          <div class="card-opt-icon">🌅</div>
+          <div class="card-opt-title">Esperança</div>
+          <div class="card-opt-desc">Luz no horizonte, fé no amanhã</div>
+        </div>
+        <div class="card-option selected" onclick="selectCard('emocaoDominante','esperança e redenção',this)">
+          <div class="card-opt-icon">🌟</div>
+          <div class="card-opt-title">Esperança e Redenção</div>
+          <div class="card-opt-desc">Superação com resolução catártica</div>
+        </div>
+        <div class="card-option" onclick="selectCard('emocaoDominante','melancolia',this)">
+          <div class="card-opt-icon">🌧️</div>
+          <div class="card-opt-title">Melancolia</div>
+          <div class="card-opt-desc">Nostalgia suave, saudade profunda</div>
+        </div>
+        <div class="card-option" onclick="selectCard('emocaoDominante','orgulho',this)">
+          <div class="card-opt-icon">🏆</div>
+          <div class="card-opt-title">Orgulho</div>
+          <div class="card-opt-desc">Conquista, dignidade, reconhecimento</div>
+        </div>
+        <div class="card-option" onclick="selectCard('emocaoDominante','empatia',this)">
+          <div class="card-opt-icon">🤝</div>
+          <div class="card-opt-title">Empatia</div>
+          <div class="card-opt-desc">Conexão humana, compreensão mútua</div>
+        </div>
+        <div class="card-option" onclick="selectCard('emocaoDominante','tensão',this)">
+          <div class="card-opt-icon">⚡</div>
+          <div class="card-opt-title">Tensão</div>
+          <div class="card-opt-desc">Suspense crescente, adrenalina narrativa</div>
+        </div>
+        <div class="card-option" onclick="selectCard('emocaoDominante','nostalgia',this)">
+          <div class="card-opt-icon">🕰️</div>
+          <div class="card-opt-title">Nostalgia</div>
+          <div class="card-opt-desc">Memórias afetivas, tempo perdido</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION: Templates -->
+    <div class="section-card">
+      <div class="section-card-title"><span class="title-icon">📋</span> Templates de Roteiro</div>
+      <div class="cards-grid-sm" id="templateCards">
+        <div class="card-option" onclick="selectTemplate('drama',this)">
+          <div class="card-opt-icon">🎭</div>
+          <div class="card-opt-title">Drama</div>
+          <div class="card-opt-desc">Conflitos internos, catarse</div>
+        </div>
+        <div class="card-option" onclick="selectTemplate('comedia',this)">
+          <div class="card-opt-icon">😂</div>
+          <div class="card-opt-title">Comédia</div>
+          <div class="card-opt-desc">Situações cômicas, personagens</div>
+        </div>
+        <div class="card-option" onclick="selectTemplate('acao',this)">
+          <div class="card-opt-icon">💥</div>
+          <div class="card-opt-title">Ação</div>
+          <div class="card-opt-desc">Tensão constante, reviravoltas</div>
+        </div>
+        <div class="card-option" onclick="selectTemplate('terror',this)">
+          <div class="card-opt-icon">👻</div>
+          <div class="card-opt-title">Terror</div>
+          <div class="card-opt-desc">Suspense, horror psicológico</div>
+        </div>
+        <div class="card-option" onclick="selectTemplate('romance',this)">
+          <div class="card-opt-icon">💕</div>
+          <div class="card-opt-title">Romance</div>
+          <div class="card-opt-desc">Amor, conflito emocional</div>
+        </div>
+        <div class="card-option" onclick="selectTemplate('sci-fi',this)">
+          <div class="card-opt-icon">🚀</div>
+          <div class="card-opt-title">Sci-Fi</div>
+          <div class="card-opt-desc">Futurista, conceitos científicos</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION: Parâmetros -->
+    <div class="section-card">
+      <div class="section-card-title"><span class="title-icon">⚙️</span> Parâmetros de Geração</div>
+      <div class="prod-grid">
+        <div class="form-group">
+          <label>País Destino</label>
+          <input type="text" id="paisDestino" value="Estados Unidos" placeholder="Ex: Brasil, EUA, Japão...">
+        </div>
+        <div class="form-group">
+          <label>Idioma</label>
+          <input type="text" id="idioma" value="en-US" placeholder="Ex: pt-BR, en-US, es-ES...">
+        </div>
+        <div class="form-group">
+          <label>Tipo de Conteúdo</label>
+          <select id="tipoConteudo">
+            <option value="microstory">Microstory (1-2 min)</option>
+            <option value="narrativa_curta" selected>Narrativa Curta (3-5 min)</option>
+            <option value="intermediaria">Intermediária (5-10 min)</option>
+            <option value="episodio">Episódio (15-20 min)</option>
+            <option value="premium">Premium (20-30 min)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Velocidade de Narração</label>
+          <select id="velocidadeNarracao">
+            <option value="lenta">Lenta</option>
+            <option value="normal" selected>Normal</option>
+            <option value="acelerada">Acelerada</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Densidade Lexical</label>
+          <select id="densidadeLexical">
+            <option value="densa">Densa</option>
+            <option value="equilibrada" selected>Equilibrada</option>
+            <option value="minimalista">Minimalista</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Objetivo Final</label>
+          <select id="objetivoFinal">
+            <option value="viralização emocional" selected>Viralização Emocional</option>
+            <option value="conversão">Conversão</option>
+            <option value="prestígio artístico">Prestígio Artístico</option>
+            <option value="imersão emocional">Imersão Emocional</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Duração Total (min)</label>
+          <input type="number" id="duracaoTotal" value="5" min="1" max="60">
+        </div>
+        <div class="form-group">
+          <label>Blocos Narrativos</label>
+          <input type="number" id="blocosNarrativos" value="5" min="1" max="20">
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION: Personagem -->
+    <div class="section-card">
+      <div class="section-card-title"><span class="title-icon">🎭</span> Personagem Principal</div>
+      <div class="prod-grid">
+        <div class="form-group">
+          <label>Nome do Personagem</label>
+          <input type="text" id="nomePersonagem" placeholder="Ex: Cole Westwood">
+        </div>
+        <div class="form-group">
+          <label>Instruções Visuais Fixas</label>
+          <input type="text" id="instrucoesVisuais" placeholder="Ex: Golden hour lighting, 35mm lens, warm tones">
+        </div>
+        <div class="form-group full">
+          <label>Descrição Visual</label>
+          <textarea id="descVisual" placeholder="Ex: Homem nos seus 30 anos, cabelos castanhos ondulados, bigode espesso..."></textarea>
+        </div>
+        <div class="form-group">
+          <label>Psicologia</label>
+          <textarea id="psicologia" placeholder="Ex: Reservado, melancólico, protetor de sua arte..."></textarea>
+        </div>
+        <div class="form-group">
+          <label>Background</label>
+          <textarea id="background" placeholder="Ex: Ex-cantor country de Austin, Texas..."></textarea>
+        </div>
+      </div>
+
+      <!-- Personagens Adicionais -->
+      <div style="margin-top:12px">
+        <div class="section-card-title" style="margin-bottom:8px"><span class="title-icon">👥</span> Personagens Adicionais</div>
+        <div id="extraCharacters"></div>
+        <button class="small-btn" onclick="addExtraCharacter()" style="margin-top:6px">+ Adicionar personagem</button>
+      </div>
+
+      <!-- Salvar / Carregar Personagem -->
+      <div style="margin-top:14px;display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+        <select id="savedCharacter" style="flex:1;min-width:160px;padding:8px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:0.82rem;font-family:Inter,sans-serif">
+          <option value="">-- Carregar personagem --</option>
+        </select>
+        <button class="small-btn green" onclick="loadCharacter()">Carregar</button>
+        <button class="small-btn purple" onclick="saveCharacter()">💾 Salvar Personagem</button>
+      </div>
+    </div>
+
+    <!-- SECTION: Extras -->
+    <div class="section-card">
+      <div class="section-card-title"><span class="title-icon">🔧</span> Configurações Extras</div>
+      <div class="prod-grid">
+        <div class="form-group">
+          <label>🏷️ Tags</label>
+          <input type="text" id="tagInput" placeholder="drama, emocao, usa" onkeypress="if(event.key==='Enter')addTag()">
+          <div id="tagsContainer" style="margin-top:6px"></div>
+        </div>
+        <div class="form-group">
+          <label>🔗 Webhook URL</label>
+          <input type="text" id="webhookUrl" placeholder="https://seu-webhook.com/api">
+        </div>
+        <div class="form-group">
+          <label>💾 Prompts Salvos</label>
+          <div style="display:flex;gap:6px;align-items:center">
+            <select id="savedPrompt" onchange="loadSavedPrompt()" style="flex:1;padding:8px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:0.82rem;font-family:Inter,sans-serif">
+              <option value="">-- Carregar config --</option>
+            </select>
+            <button class="small-btn" onclick="saveCurrentPrompt()">Salvar</button>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>🔄 Modo A/B Test</label>
+          <label class="checkbox-label" style="margin-top:4px">
+            <input type="checkbox" id="abTestMode"> Gerar 2 versões com tons alternados
+          </label>
+          <label class="checkbox-label" style="margin-top:8px">
+            <input type="checkbox" id="demoMode" onchange="toggleDemoMode()"> Modo Demo (sem API key)
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- PREVIEW -->
+    <div class="preview-panel" id="previewPanel">
+      <div class="preview-label">Preview em tempo real</div>
+      <div id="previewContent"></div>
+    </div>
+
+    <!-- GENERATE BUTTON -->
+    <div class="generate-wrap">
+      <button class="generate-btn" id="generateBtn" onclick="generateScript()">
+        <span id="btnText">🚀 Gerar Roteiro Cinematográfico</span>
+        <div class="spinner" id="btnSpinner"></div>
+      </button>
+      <div class="gen-cost">
+        <div><strong>Custo:</strong> 0 Créditos (Local)</div>
+        <div style="color:var(--text3)">Tempo estimado: ~60s</div>
+      </div>
+    </div>
+    <div class="progress-bar" id="progressBar" style="display:none">
+      <div class="progress" id="progressFill" style="width:0%"></div>
+    </div>
+
+    <!-- OUTPUT AREA -->
+    <div class="output-area" id="outputArea">
+      <div class="output-tabs" id="outputTabs">
+        <div class="output-tab active" onclick="switchTab(0)">📝 Texto Narrativo</div>
+        <div class="output-tab" onclick="switchTab(1)">🎨 Prompts Visuais</div>
+        <div class="output-tab" onclick="switchTab(2)">🎙️ Instruções de Voz</div>
+        <div class="output-tab" onclick="switchTab(3)">📊 JSON Metadados</div>
+        <div class="output-tab" onclick="switchTab(4)">🌍 Changelog Cultural</div>
+      </div>
+      <div class="output-content" id="outputContent"></div>
+      <div class="output-actions">
+        <button class="output-btn" onclick="copyOutput()">📋 Copiar</button>
+        <button class="output-btn" onclick="downloadOutput('txt')">💾 Download TXT</button>
+        <button class="output-btn" onclick="downloadOutput('json')">📦 Download JSON</button>
+      </div>
+    </div>
+
+    <!-- POST-GENERATION PANELS -->
+    <section class="section-card" id="emotionChartPanel" style="display:none;margin-top:18px">
+      <div class="section-card-title"><span class="title-icon">📈</span> Curva Emocional — Camada 1</div>
+      <div class="emotion-chart" id="emotionChart"></div>
+    </section>
+
+    <section class="section-card" id="analysisPanel" style="display:none;margin-top:18px">
+      <div class="section-card-title"><span class="title-icon">🔍</span> Análises e Validações</div>
+      <div id="analysisContent" style="font-size:0.82rem"></div>
+    </section>
+
+    <section class="section-card" id="economyPanel" style="display:none;margin-top:18px">
+      <div class="section-card-title"><span class="title-icon">💰</span> Economia Criativa — Camada 6</div>
+      <div id="economyMetrics"></div>
+    </section>
+
+    <section class="section-card" id="metacogPanel" style="display:none;margin-top:18px">
+      <div class="section-card-title"><span class="title-icon">🧠</span> Aprendizado Metacognitivo — Camada 10</div>
+      <div id="metacogContent" style="font-size:0.82rem"></div>
+    </section>
+
+    <section class="section-card" id="orchestratorPanel" style="display:none;margin-top:18px">
+      <div class="section-card-title"><span class="title-icon">🎭</span> Orquestrador Multi-LLM — Camada 5</div>
+      <div id="orchestratorStatus"></div>
+    </section>
+
+    <!-- HISTORY (hidden panel, kept for JS compatibility) -->
+    <div style="display:none">
+      <div id="historyPanel" class="history-panel"></div>
+    </div>
+  </div>
+
+  <!-- ===== VIEW: TUTORIAL ===== -->
+  <div class="view" id="view-tutorial">
+    <div class="page-header">
+      <h2>📚 Tutorial — Manual das 10 Camadas</h2>
+      <p>Referência completa do sistema C.I.U. Level 10 Ultimate.</p>
+    </div>
+
+    <div class="section-card">
+      <div class="tutorial-section">
+        <h3>🔧 APIs Disponíveis</h3>
+        <p><strong>Gemini (Google):</strong> Modelo gratuito do Google. Excelente para geração rápida. Modelo: gemini-2.5-flash.<br>
+        Obter chave: <a href="https://aistudio.google.com/app/apikey" target="_blank" style="color:var(--accent)">aistudio.google.com/app/apikey</a> — 1000 req/min grátis.</p>
+        <p><strong>Claude (Anthropic):</strong> Modelo pago. Excelente para narrativa emocional. Modelo: claude-sonnet-4.<br>
+        Obter chave: <a href="https://console.anthropic.com/" target="_blank" style="color:var(--accent)">console.anthropic.com</a> — $5 crédito gratuito.</p>
+        <p><strong>GPT (OpenAI):</strong> gpt-4o é o melhor, gpt-4o-mini é mais rápido.<br>
+        Obter chave: <a href="https://platform.openai.com/api-keys" target="_blank" style="color:var(--accent)">platform.openai.com/api-keys</a></p>
+        <p><strong>Mistral:</strong> Modelo europeu, boa relação custo-benefício.<br>
+        Obter chave: <a href="https://console.mistral.ai/" target="_blank" style="color:var(--accent)">console.mistral.ai</a></p>
+        <p><strong>Router:</strong> Testa automaticamente todas as APIs até uma funcionar — ideal para alta disponibilidade.</p>
+      </div>
+    </div>
+
+    <div class="section-card">
+      <div class="tutorial-section">
+        <h3>🧠 As 10 Camadas</h3>
+        <div class="layer-grid">
+          <div class="layer-item">
+            <div class="layer-num">Camada 1</div>
+            <div class="layer-name">Sensação Neuroemocional</div>
+            <div class="layer-desc">Curva emocional 0-100%, gatilhos de impacto, pausas estratégicas e mudanças de ritmo vocal.</div>
+          </div>
+          <div class="layer-item">
+            <div class="layer-num">Camada 2</div>
+            <div class="layer-name">Direção Cinematográfica</div>
+            <div class="layer-desc">Tipo de lente, iluminação, enquadramento e movimento de câmera por bloco narrativo.</div>
+          </div>
+          <div class="layer-item">
+            <div class="layer-num">Camada 3</div>
+            <div class="layer-name">Cognição Ética-Cultural</div>
+            <div class="layer-desc">Adaptações culturais por país, identificação de elementos sensíveis e expressões idiomáticas.</div>
+          </div>
+          <div class="layer-item">
+            <div class="layer-num">Camada 4</div>
+            <div class="layer-name">Sincronia Multimodal</div>
+            <div class="layer-desc">Trilha sonora por bloco: gênero, BPM, instrumentação. Timestamps emocionais sincronizados.</div>
+          </div>
+          <div class="layer-item">
+            <div class="layer-num">Camada 5</div>
+            <div class="layer-name">Autoria Colaborativa</div>
+            <div class="layer-desc">Orquestração Multi-LLM: Claude→Narrativa, Gemini→Cultural, Mistral→Ritmo, GPT→Voz.</div>
+          </div>
+          <div class="layer-item">
+            <div class="layer-num">Camada 6</div>
+            <div class="layer-name">Economia Criativa</div>
+            <div class="layer-desc">CTR estimado, retenção média, CPM/RPM previsto, score de originalidade e recomendações.</div>
+          </div>
+          <div class="layer-item">
+            <div class="layer-num">Camada 7</div>
+            <div class="layer-name">Controle Temporal Dinâmico</div>
+            <div class="layer-desc">Distribuição proporcional de tempo entre blocos. Ajuste de densidade conforme velocidade.</div>
+          </div>
+          <div class="layer-item">
+            <div class="layer-num">Camada 8</div>
+            <div class="layer-name">Consistência de Personagens</div>
+            <div class="layer-desc">Descrições visuais e psicológicas fixas do personagem mantidas em todos os blocos.</div>
+          </div>
+          <div class="layer-item">
+            <div class="layer-num">Camada 9</div>
+            <div class="layer-name">Adaptação Multilíngue</div>
+            <div class="layer-desc">Reescrita mantendo carga emocional. Adaptação idiomática e changelog de mudanças.</div>
+          </div>
+          <div class="layer-item">
+            <div class="layer-num">Camada 10</div>
+            <div class="layer-name">Aprendizado Metacognitivo</div>
+            <div class="layer-desc">Simulação de resposta do público, taxa de engajamento e relatório de aperfeiçoamento.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-card">
+      <div class="tutorial-section">
+        <h3>⚡ Atalhos do Teclado</h3>
+        <div class="shortcut-grid">
+          <div class="shortcut-item">
+            <div class="shortcut-key">Ctrl+G</div>
+            <div class="shortcut-desc">Gerar roteiro cinematográfico</div>
+          </div>
+          <div class="shortcut-item">
+            <div class="shortcut-key">Ctrl+S</div>
+            <div class="shortcut-desc">Salvar personagem atual</div>
+          </div>
+          <div class="shortcut-item">
+            <div class="shortcut-key">Demo Mode</div>
+            <div class="shortcut-desc">Gerar sem API (para testar)</div>
+          </div>
+          <div class="shortcut-item">
+            <div class="shortcut-key">A/B Test</div>
+            <div class="shortcut-desc">Gerar 2 versões com tons diferentes</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-card">
+      <div class="tutorial-section">
+        <h3>📊 Campos de Saída</h3>
+        <p><strong>📝 Texto Narrativo:</strong> Texto completo pronto para narração/CapCut, com marcações de pausa e emoção em colchetes.</p>
+        <p><strong>🎨 Prompts Visuais:</strong> Prompts para Midjourney/Leonardo/Veo — um por cena, com lente, iluminação e mood.</p>
+        <p><strong>🎙️ Instruções de Voz:</strong> Configurações detalhadas para ElevenLabs/Google TTS: tom, velocidade, pausas por bloco.</p>
+        <p><strong>📊 JSON Metadados:</strong> Objeto completo com todas as 10 camadas, curva emocional, trilha e métricas previstas.</p>
+        <p><strong>🌍 Changelog Cultural:</strong> Lista de adaptações realizadas por idioma/país, expressões e elementos sensíveis revisados.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== VIEW: API ===== -->
+  <div class="view" id="view-api">
+    <div class="page-header">
+      <h2>🔑 Conexões de API</h2>
+      <p>Configure suas chaves de acesso. Salvas localmente no navegador — nunca enviadas a servidores externos.</p>
+    </div>
+
+    <div class="section-card">
+      <div class="api-tabs-row" id="apiTabs">
+        <div class="api-tab active" data-api="gemini" onclick="selectAPI('gemini')">🟡 Gemini</div>
+        <div class="api-tab" data-api="claude" onclick="selectAPI('claude')">🟣 Claude</div>
+        <div class="api-tab" data-api="gpt" onclick="selectAPI('gpt')">🟢 GPT</div>
+        <div class="api-tab" data-api="mistral" onclick="selectAPI('mistral')">🔷 Mistral</div>
+        <div class="api-tab" data-api="router" onclick="selectAPI('router')">🔀 Router</div>
+      </div>
+
+      <div class="api-config-box">
+        <div class="api-config-row" id="apiConfig">
+          <div class="field">
+            <label id="keyLabel">Chave Gemini</label>
+            <input type="password" id="apiKeyInput" class="masked-input" placeholder="Cole sua API key aqui..." oninput="saveKey()">
+          </div>
+          <div class="field" id="modelField">
+            <label>Modelo</label>
+            <select id="modelSelect" onchange="saveModel()"></select>
+          </div>
+        </div>
+        <div id="routerStatus" style="display:none;margin-top:10px"></div>
+
+        <div class="api-info-box" id="apiInfoBox">
+          <span id="apiInfoText">Obter chave: <a href="https://aistudio.google.com/app/apikey" target="_blank">aistudio.google.com/app/apikey</a> — 1000 requisições/min grátis. Modelo recomendado: gemini-2.5-flash.</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-card" style="margin-top:18px">
+      <div class="section-card-title"><span class="title-icon">🔒</span> Segurança</div>
+      <p style="font-size:0.82rem;color:var(--text2);line-height:1.75">
+        Todas as chaves de API são armazenadas <strong>exclusivamente no localStorage</strong> do seu navegador.
+        O CIU Studio opera 100% offline — nenhum dado sai do seu dispositivo exceto as chamadas diretas às APIs configuradas.
+        Você pode revogar ou atualizar qualquer chave a qualquer momento nesta página.
+      </p>
+    </div>
+  </div>
+
+</main><!-- end mainArea -->
+
+<script>
+// ===== API CONFIGURATION =====
+var APIs = {
+  gemini: { label:'Gemini', badge:'Gemini Ativo', badgeClass:'gemini', keyLabel:'Chave Gemini', keyStore:'ciu_key_gemini', modelStore:'ciu_model_gemini', models:['gemini-2.5-flash'], info:'Obter chave: <a href="https://aistudio.google.com/app/apikey" target="_blank">aistudio.google.com/app/apikey</a> — 1000 req/min grátis.' },
+  claude: { label:'Claude', badge:'Claude Ativo', badgeClass:'claude', keyLabel:'Chave Anthropic', keyStore:'ciu_key_claude', modelStore:'ciu_model_claude', models:['claude-sonnet-4-20250514'], info:'Obter chave: <a href="https://console.anthropic.com/" target="_blank">console.anthropic.com</a> — $5 crédito gratuito.' },
+  gpt: { label:'GPT', badge:'GPT Ativo', badgeClass:'gpt', keyLabel:'Chave OpenAI', keyStore:'ciu_key_gpt', modelStore:'ciu_model_gpt', models:['gpt-4o','gpt-4o-mini'], info:'Obter chave: <a href="https://platform.openai.com/api-keys" target="_blank">platform.openai.com/api-keys</a>' },
+  mistral: { label:'Mistral', badge:'Mistral Ativo', badgeClass:'mistral', keyLabel:'Chave Mistral', keyStore:'ciu_key_mistral', modelStore:'ciu_model_mistral', models:['mistral-small-latest'], info:'Obter chave: <a href="https://console.mistral.ai/" target="_blank">console.mistral.ai</a>' },
+  router: { label:'Router', badge:'Router Ativo', badgeClass:'router', keyLabel:'Automatico', keyStore:'', modelStore:'', models:[], info:'O Router testa automaticamente todas as APIs configuradas em sequência.' }
+};
+var currentAPI = 'gemini';
+var outputData = ['','','','',''];
+var currentTab = 0;
+var currentView = 'overview';
+
+// ===== VIEW SWITCHING =====
+function selectView(viewId) {
+  currentView = viewId;
+  var views = document.querySelectorAll('.view');
+  var vIdx;
+  for (vIdx = 0; vIdx < views.length; vIdx++) {
+    views[vIdx].classList.remove('active');
+  }
+  var target = document.getElementById('view-' + viewId);
+  if (target) target.classList.add('active');
+
+  var navItems = document.querySelectorAll('.nav-item');
+  var nIdx;
+  for (nIdx = 0; nIdx < navItems.length; nIdx++) {
+    navItems[nIdx].classList.remove('active');
+  }
+  var navTarget = document.getElementById('nav-' + viewId);
+  if (navTarget) navTarget.classList.add('active');
+
+  var titles = { overview:'Visão Geral', producao:'Produção Cinematográfica', tutorial:'Tutorial — 10 Camadas', api:'Conexões de API' };
+  var titleEl = document.getElementById('topBarTitle');
+  if (titleEl) titleEl.textContent = titles[viewId] || viewId;
+
+  if (viewId === 'overview') refreshOverview();
+}
+
+// ===== CARD SELECTION =====
+function selectCard(selectId, value, cardEl) {
+  var sel = document.getElementById(selectId);
+  if (sel) sel.value = value;
+  var siblings = cardEl.parentNode.querySelectorAll('.card-option');
+  var i;
+  for (i = 0; i < siblings.length; i++) {
+    siblings[i].classList.remove('selected');
+  }
+  cardEl.classList.add('selected');
+}
+
+function selectTemplate(templateId, cardEl) {
+  document.getElementById('scriptTemplate').value = templateId;
+  loadTemplate();
+  // Update template card visual
+  var siblings = cardEl.parentNode.querySelectorAll('.card-option');
+  var i;
+  for (i = 0; i < siblings.length; i++) {
+    siblings[i].classList.remove('selected');
+  }
+  cardEl.classList.add('selected');
+  // Sync tom and emocao card visuals
+  syncCardVisuals();
+}
+
+function syncCardVisuals() {
+  var tomVal = document.getElementById('tomCinematografico').value;
+  var emocaoVal = document.getElementById('emocaoDominante').value;
+
+  var tomCards = document.querySelectorAll('#tomCards .card-option');
+  var i;
+  for (i = 0; i < tomCards.length; i++) {
+    var onclick = tomCards[i].getAttribute('onclick');
+    if (onclick && onclick.indexOf("'" + tomVal + "'") >= 0) {
+      tomCards[i].classList.add('selected');
+    } else {
+      tomCards[i].classList.remove('selected');
+    }
+  }
+
+  var emocaoCards = document.querySelectorAll('#emocaoCards .card-option');
+  for (i = 0; i < emocaoCards.length; i++) {
+    var onclickE = emocaoCards[i].getAttribute('onclick');
+    if (onclickE && onclickE.indexOf("'" + emocaoVal + "'") >= 0) {
+      emocaoCards[i].classList.add('selected');
+    } else {
+      emocaoCards[i].classList.remove('selected');
+    }
+  }
+}
+
+// ===== DEMO MODE =====
+function toggleDemoMode() {
+  var demo = document.getElementById('demoMode').checked;
+  document.getElementById('apiKeyInput').disabled = demo;
+  document.getElementById('modelSelect').disabled = demo;
+  toast(demo ? 'Modo Demo ativado — sem necessidade de API key' : 'Modo Demo desativado', demo ? 'info' : 'info');
+  updateTopbarPill();
+}
+
+// ===== TOAST =====
+function toast(msg, type) {
+  if (!type) type = 'info';
+  var t = document.createElement('div');
+  t.className = 'toast ' + type;
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(function() { t.remove(); }, 4000);
+}
+
+// ===== UPDATE TOPBAR PILL =====
+function updateTopbarPill() {
+  var demo = document.getElementById('demoMode') && document.getElementById('demoMode').checked;
+  var pill = document.getElementById('topbarPill');
+  var pillLabel = document.getElementById('pillLabel');
+  var pillDot = document.getElementById('pillDot');
+  var sidebarLabel = document.getElementById('sidebarApiLabel');
+
+  if (!pill) return;
+
+  pill.className = 'topbar-pill';
+  if (demo) {
+    pill.classList.add('demo');
+    if (pillLabel) pillLabel.textContent = 'Modo Demo';
+    if (pillDot) pillDot.textContent = '🟠';
+    if (sidebarLabel) sidebarLabel.textContent = 'Modo Demo';
+  } else {
+    var cfg = APIs[currentAPI];
+    if (!cfg) return;
+    pill.classList.add(cfg.badgeClass || 'gemini');
+    var icons = { gemini:'🟡', claude:'🟣', gpt:'🟢', router:'🔀', mistral:'🔷' };
+    if (pillLabel) pillLabel.textContent = cfg.badge;
+    if (pillDot) pillDot.textContent = icons[currentAPI] || '⚡';
+    if (sidebarLabel) sidebarLabel.textContent = cfg.badge;
+  }
+}
+
+// ===== API SELECTION =====
+function selectAPI(api) {
+  try {
+    currentAPI = api;
+    var apiTabs = document.querySelectorAll('.api-tab');
+    var iApi;
+    for (iApi = 0; iApi < apiTabs.length; iApi++) {
+      apiTabs[iApi].classList.toggle('active', apiTabs[iApi].dataset.api === api);
+    }
+    var cfg = APIs[api];
+    if (!cfg) { console.error('API config not found:', api); return; }
+
+    // Update hidden badge (JS compatibility)
+    var badge = document.getElementById('apiBadge');
+    if (badge) {
+      badge.textContent = cfg.badge;
+      badge.className = 'badge ' + cfg.badgeClass;
+    }
+
+    var keyLabel = document.getElementById('keyLabel');
+    var keyInput = document.getElementById('apiKeyInput');
+    var modelField = document.getElementById('modelField');
+    var modelSelect = document.getElementById('modelSelect');
+    var routerStatus = document.getElementById('routerStatus');
+    var apiInfoBox = document.getElementById('apiInfoBox');
+    var apiInfoText = document.getElementById('apiInfoText');
+
+    if (apiInfoText && cfg.info) apiInfoText.innerHTML = cfg.info;
+
+    if (api === 'router') {
+      if (keyLabel) keyLabel.textContent = 'Router Automatico';
+      if (keyInput) keyInput.style.display = 'none';
+      if (modelField) modelField.style.display = 'none';
+      if (routerStatus) routerStatus.style.display = 'block';
+      updateRouterStatus();
+    } else {
+      if (keyLabel) keyLabel.textContent = cfg.keyLabel;
+      if (keyInput) {
+        keyInput.style.display = '';
+        keyInput.value = localStorage.getItem(cfg.keyStore) || '';
+      }
+      if (modelField) modelField.style.display = '';
+      if (modelSelect && cfg.models) modelSelect.innerHTML = cfg.models.map(function(m) { return '<option value="' + m + '">' + m + '</option>'; }).join('');
+      var saved = localStorage.getItem(cfg.modelStore);
+      if (saved && modelSelect) modelSelect.value = saved;
+      if (routerStatus) routerStatus.style.display = 'none';
+    }
+
+    updateTopbarPill();
+    refreshOverviewApiStats();
+  } catch(err) {
+    console.error('selectAPI error:', err);
+  }
+}
+
+function saveKey() {
+  if (currentAPI === 'router') return;
+  localStorage.setItem(APIs[currentAPI].keyStore, document.getElementById('apiKeyInput').value.trim());
+}
+function saveModel() {
+  if (currentAPI === 'router') return;
+  localStorage.setItem(APIs[currentAPI].modelStore, document.getElementById('modelSelect').value);
+}
+
+// ===== THEME =====
+function toggleTheme() {
+  document.body.classList.toggle('light');
+  var btn = document.querySelector('.theme-toggle');
+  btn.textContent = document.body.classList.contains('light') ? '☀️' : '🌙';
+  localStorage.setItem('ciu_theme', document.body.classList.contains('light') ? 'light' : 'dark');
+}
+
+// ===== TAGS =====
+var currentTags = [];
+function addTag() {
+  var input = document.getElementById('tagInput');
+  var tag = input.value.trim().toLowerCase();
+  if (tag && currentTags.indexOf(tag) < 0) {
+    currentTags.push(tag);
+    renderTags();
+  }
+  input.value = '';
+}
+function renderTags() {
+  var container = document.getElementById('tagsContainer');
+  var html = '';
+  var i;
+  for (i = 0; i < currentTags.length; i++) {
+    html += '<span class="tag">' + currentTags[i] + '<span class="tag-remove" onclick="removeTag(\'' + currentTags[i] + '\')">&times;</span></span>';
+  }
+  container.innerHTML = html;
+}
+function removeTag(tag) {
+  currentTags = currentTags.filter(function(t) { return t !== tag; });
+  renderTags();
+}
+
+// ===== CHARACTER SAVE/LOAD =====
+function saveCharacter() {
+  var nome = document.getElementById('nomePersonagem').value;
+  if (!nome) { toast('Digite um nome primeiro', 'error'); return; }
+  var char = {
+    nome: nome,
+    descVisual: document.getElementById('descVisual').value || '',
+    psicologia: document.getElementById('psicologia').value || '',
+    background: document.getElementById('background').value || '',
+    instrucoesVisuais: document.getElementById('instrucoesVisuais').value || ''
+  };
+  var saved = JSON.parse(localStorage.getItem('ciu_characters') || '{}');
+  saved[nome] = char;
+  localStorage.setItem('ciu_characters', JSON.stringify(saved));
+  loadSavedCharacters();
+  toast('Personagem salvo!', 'success');
+}
+function loadSavedCharacters() {
+  var sel = document.getElementById('savedCharacter');
+  if (!sel) return;
+  var saved = JSON.parse(localStorage.getItem('ciu_characters') || '{}');
+  var keys = Object.keys(saved);
+  var html = '<option value="">-- Carregar --</option>';
+  for (var i = 0; i < keys.length; i++) {
+    html += '<option value="' + keys[i] + '">' + keys[i] + '</option>';
+  }
+  sel.innerHTML = html;
+}
+function loadCharacter() {
+  var nome = document.getElementById('savedCharacter').value;
+  if (!nome) return;
+  var saved = JSON.parse(localStorage.getItem('ciu_characters') || '{}');
+  var char = saved[nome];
+  if (char) {
+    var np = document.getElementById('nomePersonagem');
+    var dv = document.getElementById('descVisual');
+    var psi = document.getElementById('psicologia');
+    var bg = document.getElementById('background');
+    var iv = document.getElementById('instrucoesVisuais');
+    if (np) np.value = char.nome || '';
+    if (dv) dv.value = char.descVisual || '';
+    if (psi) psi.value = char.psicologia || '';
+    if (bg) bg.value = char.background || '';
+    if (iv) iv.value = char.instrucoesVisuais || '';
+    toast('Personagem carregado!', 'success');
+  } else {
+    toast('Personagem nao encontrado!', 'error');
+  }
+}
+
+// ===== TEMPLATES =====
+var SCRIPT_TEMPLATES = {
+  drama: { tom: 'drama realista', emocao: 'esperanca e redencao', densidade: 'equilibrada' },
+  comedia: { tom: 'comedia leve', emocao: 'alegria', densidade: 'minimalista' },
+  acao: { tom: 'acao dinamica', emocao: 'adrenalina', densidade: 'densa' },
+  terror: { tom: 'terror psicologico', emocao: 'medo', densidade: 'densa' },
+  romance: { tom: 'romance', emocao: 'amor', densidade: 'equilibrada' },
+  'sci-fi': { tom: 'ficcao cientifica', emocao: 'curiosidade', densidade: 'densa' }
+};
+function loadTemplate() {
+  var t = document.getElementById('scriptTemplate').value;
+  if (!t || !SCRIPT_TEMPLATES[t]) return;
+  var template = SCRIPT_TEMPLATES[t];
+  document.getElementById('tomCinematografico').value = template.tom;
+  document.getElementById('emocaoDominante').value = template.emocao;
+  document.getElementById('densidadeLexical').value = template.densidade;
+  toast('Template ' + t + ' carregado!', 'success');
+}
+
+// ===== EXTRA CHARACTERS =====
+var extraCharacterCount = 0;
+function addExtraCharacter() {
+  extraCharacterCount++;
+  var container = document.getElementById('extraCharacters');
+  var div = document.createElement('div');
+  div.style.marginTop = '8px';
+  div.style.padding = '10px';
+  div.style.background = 'var(--bg)';
+  div.style.borderRadius = '8px';
+  div.style.border = '1px solid var(--border)';
+  div.innerHTML = '<div style="display:flex;gap:8px;margin-bottom:6px">' +
+    '<input type="text" placeholder="Nome" id="extraCharName' + extraCharacterCount + '" style="flex:1;padding:7px 10px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:0.8rem;font-family:Inter,sans-serif">' +
+    '<input type="text" placeholder="Papel" id="extraCharRole' + extraCharacterCount + '" style="flex:1;padding:7px 10px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:0.8rem;font-family:Inter,sans-serif">' +
+    '</div>' +
+    '<textarea placeholder="Descrição" id="extraCharDesc' + extraCharacterCount + '" style="width:100%;padding:7px 10px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:0.75rem;font-family:Inter,sans-serif;resize:vertical;min-height:50px"></textarea>';
+  container.appendChild(div);
+}
+function getExtraCharacters() {
+  var chars = [];
+  for (var i = 1; i <= extraCharacterCount; i++) {
+    var name = document.getElementById('extraCharName' + i) ? document.getElementById('extraCharName' + i).value : null;
+    var role = document.getElementById('extraCharRole' + i) ? document.getElementById('extraCharRole' + i).value : null;
+    var desc = document.getElementById('extraCharDesc' + i) ? document.getElementById('extraCharDesc' + i).value : null;
+    if (name) chars.push({ nome: name, papel: role, descricao: desc });
+  }
+  return chars;
+}
+
+// ===== PROMPT CACHE =====
+function saveCurrentPrompt() {
+  var nome = document.getElementById('nomePersonagem').value || 'Sem nome';
+  var pais = document.getElementById('paisDestino').value || '';
+  var tom = document.getElementById('tomCinematografico').value || '';
+  if (!pais && !tom) return toast('Preencha os campos antes de salvar', 'error');
+  var name = 'Prompt_' + nome + '_' + Date.now();
+  var promptData = {
+    paisDestino: pais,
+    idioma: document.getElementById('idioma').value || '',
+    tom: tom,
+    emocao: document.getElementById('emocaoDominante').value || '',
+    tipo: document.getElementById('tipoConteudo').value || '',
+    objetivo: document.getElementById('objetivoFinal').value || '',
+    velocidade: document.getElementById('velocidadeNarracao').value || '',
+    densidade: document.getElementById('densidadeLexical').value || '',
+    nomePersonagem: nome
+  };
+  var saved = JSON.parse(localStorage.getItem('ciu_prompts') || '{}');
+  saved[name] = promptData;
+  localStorage.setItem('ciu_prompts', JSON.stringify(saved));
+  loadSavedPrompts();
+  toast('Configuracao salva!', 'success');
+}
+function loadSavedPrompts() {
+  var sel = document.getElementById('savedPrompt');
+  if (!sel) return;
+  var saved = JSON.parse(localStorage.getItem('ciu_prompts') || '{}');
+  var keys = Object.keys(saved);
+  var html = '<option value="">-- Carregar config --</option>';
+  for (var i = 0; i < keys.length; i++) {
+    html += '<option value="' + keys[i] + '">' + keys[i] + '</option>';
+  }
+  sel.innerHTML = html;
+}
+function loadSavedPrompt() {
+  var name = document.getElementById('savedPrompt').value;
+  if (!name) return;
+  var saved = JSON.parse(localStorage.getItem('ciu_prompts') || '{}');
+  var data = saved[name];
+  if (!data) return;
+  if (data.paisDestino) document.getElementById('paisDestino').value = data.paisDestino;
+  if (data.idioma) document.getElementById('idioma').value = data.idioma;
+  if (data.tom) document.getElementById('tomCinematografico').value = data.tom;
+  if (data.emocao) document.getElementById('emocaoDominante').value = data.emocao;
+  if (data.tipo) document.getElementById('tipoConteudo').value = data.tipo;
+  if (data.objetivo) document.getElementById('objetivoFinal').value = data.objetivo;
+  if (data.velocidade) document.getElementById('velocidadeNarracao').value = data.velocidade;
+  if (data.densidade) document.getElementById('densidadeLexical').value = data.densidade;
+  if (data.nomePersonagem) document.getElementById('nomePersonagem').value = data.nomePersonagem;
+  syncCardVisuals();
+  toast('Configuracao carregada!', 'success');
+}
+
+// ===== LANGUAGE DETECTION =====
+function detectLanguage(text) {
+  var pt = /[áàâãéêíóôõúüç]/i.test(text) || /\b(não|para|como|mais|muito)\b/i.test(text);
+  var en = /\b(the|and|is|for|with|that|this)\b/i.test(text);
+  var es = /\b(el|la|que|es|en|para|con)\b/i.test(text);
+  if (pt) return 'pt-BR';
+  if (en) return 'en-US';
+  if (es) return 'es-ES';
+  return 'unknown';
+}
+
+// ===== SENTIMENT ANALYSIS =====
+function analyzeSentiment(text) {
+  var positive = /\b(amor|hope|feliz|alegre|esperança|sucesso|felicidade|beleza|maravilhoso|ótimo|sorriso|abraço)\b/gi;
+  var negative = /\b(morte|tristeza|medo|pavor|desespero|perda|dor|sofrimento|fracasso|terror|horror|choro)\b/gi;
+  var neutral = /\b(caminho|porta|janela|luz|céu|terra|mar)\b/gi;
+  var pos = (text.match(positive) || []).length;
+  var neg = (text.match(negative) || []).length;
+  var neu = (text.match(neutral) || []).length;
+  if (pos > neg && pos > neu) return { sentiment: 'positive', score: pos / (pos + neg + neu + 1) };
+  if (neg > pos && neg > neu) return { sentiment: 'negative', score: neg / (pos + neg + neu + 1) };
+  return { sentiment: 'neutral', score: neu / (pos + neg + neu + 1) };
+}
+
+// ===== STRUCTURE VALIDATOR =====
+function validateStructure(output) {
+  var required = ['===TEXTO_NARRATIVO===', '===PROMPTS_VISUAIS===', '===INSTRUCOES_VOZ===', '===JSON_METADADOS===', '===CHANGELOG_CULTURAL==='];
+  var missing = required.filter(function(s) { return output.indexOf(s) < 0; });
+  return { valid: missing.length === 0, missing: missing };
+}
+
+// ===== READING TIME =====
+function calculateReadingTime(text) {
+  var words = text.split(/\s+/).length;
+  var chars = text.length;
+  return {
+    palavras: words,
+    caracteres: chars,
+    tempo_lento: Math.ceil(words / 120) + ' min',
+    tempo_normal: Math.ceil(words / 150) + ' min',
+    tempo_rapido: Math.ceil(words / 180) + ' min'
+  };
+}
+
+// ===== HASHTAG GENERATOR =====
+function generateHashtags(text, params) {
+  var tags = [];
+  var emocao = params && params.emocao ? params.emocao.toLowerCase() : '';
+  var tipo = params && params.tipo ? params.tipo.toLowerCase() : '';
+  if (emocao.indexOf('esperança') >= 0) tags.push('#Esperança');
+  if (emocao.indexOf('amor') >= 0) tags.push('#Amor');
+  if (emocao.indexOf('medo') >= 0) tags.push('#Terror');
+  if (tipo.indexOf('drama') >= 0) tags.push('#Drama');
+  if (tipo.indexOf('comédia') >= 0) tags.push('#Comédia');
+  tags.push('#Cinema', '#Roteiro', '#Filme_br', '#Storytelling');
+  if (params && params.pais && params.pais.indexOf('Brasil') >= 0) tags.push('#CinemaBrasileiro');
+  return tags.join(' ');
+}
+
+// ===== PROMPT OPTIMIZER =====
+function optimizePrompt(basePrompt, params) {
+  var optimized = basePrompt + '\n\n--- OTIMIZACAO ---\n1. Seja especifico\n2. Use sensorial\n3. Mantenha tensao\n4. Evite adverbos\n5. Mostre';
+  return optimized;
+}
+
+// ===== HISTORY =====
+function addToHistory(output, paramsData) {
+  if (!paramsData) paramsData = { nomePersonagem: 'Unknown' };
+  var history = JSON.parse(localStorage.getItem('ciu_history') || '[]');
+  var entry = { date: new Date().toLocaleString(), params: paramsData, tags: currentTags || [] };
+  history.unshift(entry);
+  if (history.length > 10) history.pop();
+  localStorage.setItem('ciu_history', JSON.stringify(history));
+  renderHistory();
+}
+function renderHistory() {
+  var panel = document.getElementById('historyPanel');
+  if (!panel) return;
+  var history = JSON.parse(localStorage.getItem('ciu_history') || '[]');
+  if (history.length === 0) {
+    panel.innerHTML = '<div style="text-align:center;color:#9090a8;padding:20px">Nenhuma geracao ainda</div>';
+    return;
+  }
+  var html = '';
+  var i;
+  for (i = 0; i < history.length; i++) {
+    var h = history[i];
+    html += '<div class="history-item" onclick="loadHistory(' + i + ')"><div>' + (h.params ? h.params.nomePersonagem : 'Sem nome') + '</div><div class="date">' + h.date + '</div></div>';
+  }
+  panel.innerHTML = html;
+}
+function loadHistory(idx) {
+  var history = JSON.parse(localStorage.getItem('ciu_history') || '[]');
+  var h = history[idx];
+  if (h && h.params) {
+    document.getElementById('nomePersonagem').value = h.params.nomePersonagem || '';
+    document.getElementById('paisDestino').value = h.params.pais || '';
+    document.getElementById('idioma').value = h.params.idioma || '';
+    currentTags = h.tags || [];
+    renderTags();
+    toast('Histórico carregado!', 'success');
+  }
+}
+
+// ===== OVERVIEW REFRESH =====
+function refreshOverview() {
+  refreshOverviewApiStats();
+  refreshOverviewHistory();
+  refreshOverviewChars();
+  refreshOverviewOrch();
+}
+
+function refreshOverviewApiStats() {
+  var apiNameEl = document.getElementById('ov-apiName');
+  var apiModelEl = document.getElementById('ov-apiModel');
+  if (apiNameEl) apiNameEl.textContent = APIs[currentAPI] ? APIs[currentAPI].label : currentAPI;
+  if (apiModelEl) {
+    var modelEl = document.getElementById('modelSelect');
+    apiModelEl.textContent = modelEl ? (modelEl.value || APIs[currentAPI].models[0] || '—') : '—';
+  }
+  var totalGen = JSON.parse(localStorage.getItem('ciu_history') || '[]').length;
+  var totalChars = Object.keys(JSON.parse(localStorage.getItem('ciu_characters') || '{}')).length;
+  var genEl = document.getElementById('ov-totalGen');
+  var charEl = document.getElementById('ov-totalChars');
+  if (genEl) genEl.textContent = totalGen;
+  if (charEl) charEl.textContent = totalChars;
+}
+
+function refreshOverviewHistory() {
+  var history = JSON.parse(localStorage.getItem('ciu_history') || '[]');
+  var el = document.getElementById('ovHistoryList');
+  if (!el) return;
+  if (history.length === 0) {
+    el.innerHTML = '<div class="activity-empty">Nenhuma geração ainda.<br><span style="color:var(--accent);cursor:pointer" onclick="selectView(\'producao\')">→ Criar primeiro roteiro</span></div>';
+    return;
+  }
+  var html = '';
+  var i;
+  for (i = 0; i < history.length && i < 10; i++) {
+    var h = history[i];
+    var nome = h.params ? (h.params.nomePersonagem || 'Sem nome') : 'Sem nome';
+    var initials = nome.charAt(0).toUpperCase() + (nome.charAt(1) || '').toUpperCase();
+    var api = h.params && h.params.api ? h.params.api : '?';
+    html += '<div class="activity-item" onclick="loadHistory(' + i + ');selectView(\'producao\')">' +
+      '<div class="activity-avatar">' + initials + '</div>' +
+      '<div><div class="activity-name">' + nome + '</div>' +
+      '<div class="activity-meta">' + (h.params && h.params.tipo ? h.params.tipo : '—') + ' · ' + (h.params && h.params.idioma ? h.params.idioma : '—') + '</div></div>' +
+      '<div class="activity-date">' + (h.date || '') + '</div>' +
+      '</div>';
+  }
+  el.innerHTML = html;
+}
+
+function refreshOverviewChars() {
+  var chars = JSON.parse(localStorage.getItem('ciu_characters') || '{}');
+  var keys = Object.keys(chars);
+  var el = document.getElementById('ovCharGrid');
+  if (!el) return;
+  if (keys.length === 0) {
+    el.innerHTML = '<div class="activity-empty" style="grid-column:1/-1">Nenhum personagem salvo ainda.</div>';
+    return;
+  }
+  var html = '';
+  var i;
+  for (i = 0; i < keys.length; i++) {
+    var c = chars[keys[i]];
+    html += '<div class="char-card" onclick="selectView(\'producao\')">' +
+      '<div class="char-name">' + keys[i] + '</div>' +
+      '<div class="char-desc">' + (c.descVisual || 'Sem descrição visual') + '</div>' +
+      '</div>';
+  }
+  el.innerHTML = html;
+}
+
+function refreshOverviewOrch() {
+  var grid = document.getElementById('ovOrchGrid');
+  if (!grid) return;
+  var apis2 = [
+    { key: 'gemini', name: 'Gemini', icon: '🟡' },
+    { key: 'claude', name: 'Claude', icon: '🟣' },
+    { key: 'mistral', name: 'Mistral', icon: '🔷' },
+    { key: 'gpt', name: 'GPT', icon: '🟢' }
+  ];
+  var html = '';
+  var i;
+  for (i = 0; i < apis2.length; i++) {
+    var a = apis2[i];
+    var hasKey = !!localStorage.getItem(APIs[a.key].keyStore);
+    html += '<div class="orch-item">' +
+      '<div class="orch-status-dot ' + (hasKey ? 'ok' : 'miss') + '"></div>' +
+      '<div><div class="orch-name">' + a.icon + ' ' + a.name + '</div>' +
+      '<div class="orch-sub">' + (hasKey ? 'Chave configurada' : 'Sem chave') + '</div></div>' +
+      '</div>';
+  }
+  grid.innerHTML = html;
+}
+
+function updateOverviewMetrics(ctr, ret, cpm, orig) {
+  var el = document.getElementById('ovMetrics');
+  if (!el) return;
+  el.innerHTML = '<div class="metric-mini-item"><div class="metric-mini-val">' + ctr + '%</div><div class="metric-mini-label">CTR</div></div>' +
+    '<div class="metric-mini-item"><div class="metric-mini-val">' + ret + '%</div><div class="metric-mini-label">Retenção</div></div>' +
+    '<div class="metric-mini-item"><div class="metric-mini-val">$' + cpm + '</div><div class="metric-mini-label">CPM</div></div>' +
+    '<div class="metric-mini-item"><div class="metric-mini-val">' + orig + '</div><div class="metric-mini-label">Originalidade</div></div>';
+}
+
+// ===== EXPORT =====
+function copyOutput() {
+  var text = outputData[currentTab] || '';
+  navigator.clipboard.writeText(text);
+  toast('Copiado para clipboard!', 'success');
+}
+function downloadOutput(type) {
+  var text = outputData.join('\n\n===---===\n\n');
+  var blob, filename;
+  if (type === 'txt') {
+    blob = new Blob([text], { type: 'text/plain' });
+    filename = 'roteiro_' + Date.now() + '.txt';
+  } else if (type === 'json') {
+    var jsonData = { outputs: outputData, versao: 'CIU Studio v10.2', tags: currentTags || [] };
+    blob = new Blob([JSON.stringify(jsonData, null, 2)], { type: 'application/json' });
+    filename = 'roteiro_' + Date.now() + '.json';
+  }
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = filename;
+  a.click();
+  toast('Download: ' + filename, 'success');
+}
+
+// ===== WEBHOOK =====
+function sendWebhook(data) {
+  var url = document.getElementById('webhookUrl').value;
+  if (!url) return;
+  fetch(url, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(data) })
+    .then(function() { toast('Webhook enviado!', 'success'); })
+    .catch(function(e) { toast('Webhook erro: ' + e.message, 'error'); });
+}
+
+// ===== EMOTION CHART =====
+function renderEmotionChart() {
+  var chart = document.getElementById('emotionChart');
+  var curve = [0.25, 0.50, 0.85, 0.70, 0.60];
+  var html = '';
+  var i;
+  for (i = 0; i < curve.length; i++) {
+    html += '<div class="emotion-bar" style="height:' + (curve[i] * 100) + '%" data-value="' + Math.round(curve[i] * 100) + '%">B' + (i + 1) + '</div>';
+  }
+  chart.innerHTML = html;
+  document.getElementById('emotionChartPanel').style.display = 'block';
+}
+
+// ===== ECONOMY METRICS =====
+function renderEconomyMetrics() {
+  var ctr = (Math.random() * 10 + 4).toFixed(1);
+  var retencao = Math.floor(Math.random() * 20 + 70);
+  var cpm = (Math.random() * 20 + 8).toFixed(1);
+  var originalidade = (Math.random() * 0.3 + 0.7).toFixed(2);
+  var idioma = document.getElementById('idioma').value;
+  var melhorPub = idioma === 'en-US' ? 'Sexta 19h (EUA)' : 'Sábado 14h (BR)';
+  var trads = idioma === 'en-US' ? ['pt-BR', 'es-ES'] : ['en-US', 'es-ES'];
+  var metrics = '<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px">' +
+    '<div class="mini-card"><div class="mini-card-label">CTR Estimado</div><div class="mini-card-val">' + ctr + '%</div></div>' +
+    '<div class="mini-card"><div class="mini-card-label">Retenção Média</div><div class="mini-card-val">' + retencao + '%</div></div>' +
+    '<div class="mini-card"><div class="mini-card-label">CPM Estimado</div><div class="mini-card-val">$' + cpm + '</div></div>' +
+    '<div class="mini-card"><div class="mini-card-label">Originalidade</div><div class="mini-card-val">' + originalidade + '</div></div>' +
+    '</div>' +
+    '<div class="mini-card" style="margin-top:10px">' +
+    '<div class="mini-card-label">Recomendações</div>' +
+    '<p style="font-size:0.8rem;color:var(--text2);margin-top:6px">📅 Melhor horário: <strong style="color:var(--text)">' + melhorPub + '</strong></p>' +
+    '<p style="font-size:0.8rem;color:var(--text2)">🌐 Traduções: <strong style="color:var(--text)">' + trads.join(', ') + '</strong></p>' +
+    '<p style="font-size:0.8rem;color:var(--text2)">💵 Se views > 100k, investir em tradução</p>' +
+    '</div>';
+  document.getElementById('economyMetrics').innerHTML = metrics;
+  document.getElementById('economyPanel').style.display = 'block';
+  updateOverviewMetrics(ctr, retencao, cpm, originalidade);
+}
+
+// ===== METACOGNITIVE =====
+function renderMetacognitive() {
+  var comments = ['Narrativa muito envolvente no bloco 3', 'Gatilho emocional funcionou bem', 'Pausa dramática no bloco 2 foi eficaz'];
+  var emotions = ['esperança', 'empatia', 'curiosidade'];
+  var engajamento = Math.floor(Math.random() * 30 + 65);
+  var recomendacoes = ['Aumentar tensão no Bloco 3 em 15%', 'Reduzir pausas no Bloco 5 para manter ritmo', 'Adicionar mais gatilhos emocionais no Bloco 1'];
+  var content = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">' +
+    '<div><div style="font-size:0.7rem;color:var(--text3);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.8px">Simulação de Resposta</div>' +
+    '<p style="font-size:0.8rem;color:var(--text2);margin-bottom:6px">Comentários esperados:</p>' +
+    '<ul style="font-size:0.78rem;padding-left:16px;color:var(--text2)">' + comments.map(function(c) { return '<li style="margin-bottom:4px">' + c + '</li>'; }).join('') + '</ul></div>' +
+    '<div><div style="font-size:0.7rem;color:var(--text3);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.8px">Emoções Predominantes</div>' +
+    '<div style="display:flex;gap:6px;flex-wrap:wrap">' + emotions.map(function(e) { return '<span style="padding:3px 10px;background:rgba(61,126,255,0.2);color:#3d7eff;border-radius:12px;font-size:0.72rem;border:1px solid rgba(61,126,255,0.3)">' + e + '</span>'; }).join('') + '</div>' +
+    '<p style="margin-top:10px;font-size:0.8rem;color:var(--text2)">Taxa de engajamento: <strong style="color:var(--text)">' + engajamento + '%</strong></p></div></div>' +
+    '<div class="mini-card" style="margin-top:10px"><div class="mini-card-label">Relatório de Aperfeiçoamento</div>' +
+    '<ul style="font-size:0.78rem;padding-left:16px;color:var(--text2);margin-top:8px">' + recomendacoes.map(function(r) { return '<li style="margin-bottom:4px">' + r + '</li>'; }).join('') + '</ul></div>';
+  document.getElementById('metacogContent').innerHTML = content;
+  document.getElementById('metacogPanel').style.display = 'block';
+}
+
+// ===== ANALYSIS =====
+function renderAnalysis() {
+  var text = outputData[0] || '';
+  var lang = detectLanguage(text);
+  var sentiment = analyzeSentiment(text);
+  var validation = validateStructure(outputData.join('\n'));
+  var timeInfo = calculateReadingTime(text);
+  var currentParams = {
+    pais: document.getElementById('paisDestino') ? document.getElementById('paisDestino').value : '',
+    idioma: document.getElementById('idioma') ? document.getElementById('idioma').value : '',
+    tipo: document.getElementById('tipoConteudo') ? document.getElementById('tipoConteudo').value : '',
+    emocao: document.getElementById('emocaoDominante') ? document.getElementById('emocaoDominante').value : ''
+  };
+  var hashtags = generateHashtags(text, currentParams);
+  var sentColors = { positive:'#22c55e', negative:'#ef4444', neutral:var_text2 || '#7b91b0' };
+  var sentColor = sentColors[sentiment.sentiment] || '#7b91b0';
+  var content = '<div class="analysis-row">' +
+    '<div class="mini-card"><div class="mini-card-label">Idioma Detectado</div><div class="mini-card-val" style="font-size:1rem">' + lang + '</div></div>' +
+    '<div class="mini-card"><div class="mini-card-label">Sentimento</div><div class="mini-card-val" style="font-size:1rem;color:' + sentColor + '">' + sentiment.sentiment + '</div></div>' +
+    '<div class="mini-card"><div class="mini-card-label">Palavras</div><div class="mini-card-val">' + timeInfo.palavras + '</div></div>' +
+    '<div class="mini-card"><div class="mini-card-label">Tempo Normal</div><div class="mini-card-val" style="font-size:1rem">' + timeInfo.tempo_normal + '</div></div>' +
+    '</div>' +
+    '<div class="mini-card" style="margin-top:10px"><div class="mini-card-label">Estrutura</div>' +
+    '<p style="font-size:0.78rem;margin-top:6px;color:' + (validation.valid ? '#22c55e' : '#f59e0b') + '">' +
+    (validation.valid ? '✅ Todas as 5 seções detectadas' : '⚠️ Seções ausentes: ' + validation.missing.join(', ')) + '</p></div>' +
+    '<div class="mini-card" style="margin-top:10px"><div class="mini-card-label">Hashtags Sugeridas</div>' +
+    '<p style="font-size:0.75rem;color:var(--text2);margin-top:6px;font-family:monospace">' + hashtags + '</p></div>';
+  document.getElementById('analysisContent').innerHTML = content;
+  document.getElementById('analysisPanel').style.display = 'block';
+}
+
+var var_text2 = '#7b91b0';
+
+// ===== PREVIEW =====
+function updatePreview() {
+  var p = {
+    pais: document.getElementById('paisDestino') ? document.getElementById('paisDestino').value : '',
+    idioma: document.getElementById('idioma') ? document.getElementById('idioma').value : '',
+    tipo: document.getElementById('tipoConteudo') ? document.getElementById('tipoConteudo').value : '',
+    emocao: document.getElementById('emocaoDominante') ? document.getElementById('emocaoDominante').value : '',
+    nomePersonagem: document.getElementById('nomePersonagem') ? document.getElementById('nomePersonagem').value : ''
+  };
+  var preview = document.getElementById('previewContent');
+  if (!preview) return;
+  preview.innerHTML = '<p><strong>País:</strong> ' + p.pais + '</p><p><strong>Idioma:</strong> ' + p.idioma + '</p><p><strong>Tipo:</strong> ' + p.tipo + '</p><p><strong>Emoção:</strong> ' + p.emocao + '</p><p><strong>Personagem:</strong> ' + (p.nomePersonagem || 'não definido') + '</p>';
+  document.getElementById('previewPanel').style.display = 'block';
+}
+
+// ===== ROUTER STATUS =====
+function updateRouterStatus() {
+  var el = document.getElementById('routerStatus');
+  if (!el) return;
+  var checks = [
+    { api:'gemini', name:'Gemini' },
+    { api:'claude', name:'Claude' },
+    { api:'mistral', name:'Mistral' },
+    { api:'gpt', name:'GPT' }
+  ];
+  var html = '<div style="font-size:0.75rem;color:var(--text3);margin-bottom:8px">APIs disponíveis para roteamento:</div><div class="router-status-grid">';
+  var iUR;
+  for (iUR = 0; iUR < checks.length; iUR++) {
+    var c = checks[iUR];
+    var hasKey = localStorage.getItem(APIs[c.api].keyStore);
+    html += '<div class="router-status-item ' + (hasKey ? 'ok' : 'miss') + '">' +
+      '<div style="width:6px;height:6px;border-radius:50%;background:currentColor"></div>' +
+      c.name + (hasKey ? ' ✓' : ' —') + '</div>';
+  }
+  html += '</div>';
+  el.innerHTML = html;
+}
+
+// ===== TAB SWITCHING =====
+function switchTab(idx) {
+  currentTab = idx;
+  var tabs = document.querySelectorAll('.output-tab');
+  for (var i = 0; i < tabs.length; i++) {
+    tabs[i].classList.toggle('active', i === idx);
+  }
+  renderTab();
+}
+function renderTab() {
+  var el = document.getElementById('outputContent');
+  if (currentTab === 3 || currentTab === 4) {
+    el.innerHTML = '<pre>' + escapeHtml(outputData[currentTab]) + '</pre>';
+  } else {
+    el.innerHTML = '<div class="narrative">' + formatText(outputData[currentTab]) + '</div>';
+  }
+}
+function escapeHtml(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function formatText(s) {
+  return s.split('\n').map(function(l) { return l.trim() ? '<p>' + l + '</p>' : ''; }).join('');
+}
+
+// ===== DEMO OUTPUT =====
+function generateDemoOutput(params) {
+  var nome = params.nomePersonagem;
+  var pais = params.pais;
+  var emocao = params.emocao;
+  var duracao = params.duracao;
+  var blocos = params.blocos;
+  var idioma = params.idioma;
+  var tempoPorBloco = Math.floor((duracao * 60) / blocos);
+  var isEN = idioma === 'en-US';
+  var textPT = '[intro instrumental suave]\n[voz rouca, pausada]\n\nEm uma estrada sem fim de ' + pais + ', ' + (params.descVisual || 'um homem marcado pelo tempo') + ', caminha sozinho sob o ceu poente. [pausa 3s] Os ultimos raios de sol dourado pintam sua silhouette de nostalgia.\n\n[gatilho emocional: silencio profundo]\n\nEle carrega consigo memorias de um passado que nunca volta. [voz tremula] Cada passo e uma recordacao.\n\n[CENA 2]\n\n[trilha folk-ambiente, 72 BPM]\n\nO vento sussurra segredos que so a noite conhece. [tom reflexivo]\n\nMas nao. Ele para. [pausa 2s] Olha para o horizonte.\n\n[gatilho emocional: renascer]\n\nO amanha pertence aos que continuam caminhando.\n\n[CENA 3 - CONCLUSAO]\n\nE assim, ' + nome + ', encontra sua redencao no caminho. [pausa 2s] A esperanca nao e um lugar. E uma decisão.\n\n[voz calorosa, final]\n\nFim.';
+  var textEN = '[Soft instrumental intro]\n[Rough voice, paused]\n\nOn an endless road in ' + pais + ', ' + (params.descVisual || 'a man marked by time') + ', walks alone under the sunset sky. [pause 3s] The last golden rays paint his silhouette with nostalgia.\n\n[Emotional trigger: deep silence]\n\nHe carries memories of a past that will never return. [Trembling voice] Every step is a memory.\n\n[SCENE 2]\n\n[folk-ambient soundtrack, 72 BPM]\n\nThe wind whispers secrets only the night knows. [Reflective tone]\n\nBut no. He stops. [pause 2s] He looks at the horizon.\n\n[Emotional trigger: rebirth]\n\nTomorrow belongs to those who keep walking.\n\n[SCENE 3 - CONCLUSION]\n\nAnd so, ' + nome + ', finds his redemption in the journey. [pause 2s] Hope is not a place. It is a decision.\n\n[Warm voice, final]\n\nThe End.';
+  var text = isEN ? textEN : textPT;
+  var prompts = 'CENA 1: "Lonely figure walking on endless highway at golden sunset, cinematic 35mm lens, warm golden hour lighting, dramatic clouds, 4K quality"\n\nCENA 2: "Man standing still facing horizon during sunset, contemplative pose, rugged clothing, golden hour glow, cinematic composition, 4K"\n\nCENA 3: "Man walking away into sunset with renewed hope, silhouette against colorful sky, cinematic wide shot, inspirational mood, 4K"';
+  var voicePT = 'BLOQUEAR 1:\n- Tom: rouco, pausado, melancolico\n- Velocidade: lenta (120 ppm)\n- Pausas: [pausa 3s]\n- Emocao: nostalgia profunda\n\nBLOQUEAR 2:\n- Tom: reflexivo, em transicao\n- Velocidade: normal (150 ppm)\n- Pausas: [pausa 2s]\n- Emocao: reconstruindo esperanca\n\nCONCLUSAO:\n- Tom: caloroso, esperancoso\n- Velocidade: normal\n- Emocao: redencao e luz';
+  var voiceEN = 'BLOCK 1:\n- Tone: rough, paused, melancholic\n- Speed: slow (120 wpm)\n- Pauses: [pause 3s]\n- Emotion: deep nostalgia\n\nBLOCK 2:\n- Tone: reflective, transitioning\n- Speed: normal (150 wpm)\n- Pauses: [pause 2s]\n- Emotion: rebuilding hope\n\nCONCLUSION:\n- Tone: warm, hopeful\n- Speed: normal\n- Emotion: redemption and light';
+  var voice = isEN ? voiceEN : voicePT;
+  var json = '{"parametros": {"pais_destino": "' + pais + '", "idioma": "' + idioma + '", "tipo_conteudo": "' + params.tipo + '", "duracao_minutos": ' + duracao + ', "blocos_narrativos": ' + blocos + ', "tempo_por_bloco_segundos": ' + tempoPorBloco + ', "tom_cinematico": "' + params.tom + '", "emocao_dominante": "' + emocao + '", "velocidade_narracao": "' + params.velocidade + '", "densidade_lexical": "' + params.densidade + '", "objetivo_final": "' + params.objetivo + '"}, "curva_emocional": {"bloco_1": 0.25, "bloco_2": 0.50, "bloco_3": 0.85, "bloco_4": 0.70, "bloco_5": 0.60}, "gatilhos_emocionais": ["silencio", "renascer", "esperanca"], "personagem": {"nome": "' + nome + '"}, "metricas_previstas": {"ctr_estimado": 6.2, "retencao_media": 78, "originalidade": 0.91}, "camadas_ativas": 10, "versao": "10.2 Ultimate"}';
+  var changelogPT = '## Adaptacoes Culturais (' + pais + ')\n\n### Termos Adaptados:\n- Referencias regionais substituidas\n- Expressoes idiomaticas ajustadas\n\n### Validacoes:\n- Elementos sensiveis verificados\n- Conflitos culturais evitados\n- Representacao autentica mantida';
+  var changelogEN = '## Cultural Adapters (' + pais + ')\n\n### Adapted Terms:\n- Regional references replaced\n- Idiomatic expressions adjusted\n\n### Validations:\n- Sensitive elements verified\n- Cultural conflicts avoided\n- Authentic representation maintained';
+  var changelog = isEN ? changelogEN : changelogPT;
+  return '===TEXTO_NARRATIVO===\n' + text + '\n\n===PROMPTS_VISUAIS===\n' + prompts + '\n\n===INSTRUCOES_VOZ===\n' + voice + '\n\n===JSON_METADADOS===\n' + json + '\n\n===CHANGELOG_CULTURAL===\n' + changelog;
+}
+
+// ===== SYSTEM PROMPT =====
+function getSystemPrompt(params) {
+  return '# C.I.U. Level 10 Ultimate\nVersão: 10.2 Final\n\n## OBJETIVO\nVocê é o C.I.U. (Creative Intelligence Universal), um sistema modular de geração de conteúdo cinematográfico narrativo com 10 camadas progressivas de inteligência criativa.\n\n## PARÂMETROS DESTA GERAÇÃO\n- País destino: ' + params.pais + '\n- Idioma: ' + params.idioma + '\n- IMPORTANTE: Todo o conteúdo deve ser EXCLUSIVAMENTE em ' + params.idioma + '.\n- Tipo de conteúdo: ' + params.tipo + '\n- Duração total: ' + params.duracao + ' minutos\n- Blocos narrativos: ' + params.blocos + '\n- Emoção dominante: ' + params.emocao + '\n- Tom cinemático: ' + params.tom + '\n- Velocidade de narração: ' + params.velocidade + '\n- Densidade lexical: ' + params.densidade + '\n- Objetivo final: ' + params.objetivo + '\n- Personagem principal: ' + params.nomePersonagem + '\n- Descrição visual: ' + params.descVisual + '\n- Psicologia: ' + params.psicologia + '\n- Background: ' + params.background + '\n- Instruções visuais fixas: ' + params.instrucoesVisuais + '\n\n## FORMATO DE SAÍDA OBRIGATÓRIO\nResponda com EXATAMENTE estas 5 seções:\n\n===TEXTO_NARRATIVO===\n(Texto narrativo completo pronto para narração, com marcações de pausa)\n\n===PROMPTS_VISUAIS===\n(Prompts visuais para IA — um por cena/bloco)\n\n===INSTRUCOES_VOZ===\n(Instruções detalhadas de voz por trecho)\n\n===JSON_METADADOS===\n(JSON completo com curva_emocional, direcao_cinematografica, trilha_sonora, metricas_previstas, personagem, adaptacoes_culturais, recomendacoes, camadas_ativas: 10)\n\n===CHANGELOG_CULTURAL===\n(Lista de adaptações culturais realizadas)';
+}
+
+// ===== API CALL FUNCTIONS =====
+async function callGemini(key, model, prompt) {
+  var controller = new AbortController();
+  var timeout = setTimeout(function() { controller.abort(); }, 30000);
+  try {
+    var r = await fetch('https://generativelanguage.googleapis.com/v1beta/models/' + model + ':generateContent?key=' + key, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ system_instruction:{parts:[{text: prompt.system}]}, contents:[{parts:[{text: prompt.user}]}], generationConfig:{temperature:0.9,maxOutputTokens:8192} }),
+      signal: controller.signal
+    });
+    clearTimeout(timeout);
+    if (!r.ok) {
+      var errData = await r.json().catch(function() { return {}; });
+      var msg = errData.error ? errData.error.message : r.statusText;
+      if (msg.includes('high demand')) throw new Error('HIGH_DEMAND:' + msg);
+      throw new Error(msg);
+    }
+    var d = await r.json();
+    return d.candidates && d.candidates[0] && d.candidates[0].content && d.candidates[0].content.parts && d.candidates[0].content.parts[0] ? d.candidates[0].content.parts[0].text : '';
+  } catch(e) {
+    clearTimeout(timeout);
+    var emsg = e.message || '';
+    if (e.name === 'AbortError') throw new Error('Timeout - API demorou muito');
+    if (emsg.indexOf('quota') >= 0 || emsg.indexOf('exceeded') >= 0) throw new Error('QUOTA_EXCEEDED:Limite gratuito esgotado. Use outra API ou Modo Demo.');
+    if (emsg.indexOf('high demand') >= 0) throw new Error('HIGH_DEMAND:Modelo sobrecarregado, tente outro modelo');
+    if (emsg.indexOf('not found') >= 0 || emsg.indexOf('not supported') >= 0) throw new Error('MODELO_INDISPONIVEL:Modelo nao disponivel. Escolha outro.');
+    throw e;
+  }
+}
+
+async function callClaude(key, model, prompt) {
+  var controller = new AbortController();
+  var timeout = setTimeout(function() { controller.abort(); }, 60000);
+  try {
+    var r = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST', headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body: JSON.stringify({ model: model, max_tokens:8192, temperature:0.9, system: prompt.system, messages:[{role:'user',content: prompt.user}] }),
+      signal: controller.signal
+    });
+    clearTimeout(timeout);
+    if (!r.ok) { var e = await r.json().catch(function() { return {}; }); throw new Error(e.error ? e.error.message : r.statusText); }
+    var d = await r.json();
+    return d.content && d.content[0] ? d.content[0].text : '';
+  } catch(e) {
+    clearTimeout(timeout);
+    if (e.name === 'AbortError') throw new Error('Timeout - API demorou muito');
+    throw e;
+  }
+}
+
+async function callGPT(key, model, prompt) {
+  var controller = new AbortController();
+  var timeout = setTimeout(function() { controller.abort(); }, 60000);
+  try {
+    var r = await fetch('https://api.openai.com/v1/chat/completions', {
+      method:'POST', headers:{'Content-Type':'application/json','Authorization':'Bearer ' + key},
+      body: JSON.stringify({ model: model, temperature:0.9, max_tokens:8192, messages:[{role:'system',content: prompt.system},{role:'user',content: prompt.user}] }),
+      signal: controller.signal
+    });
+    clearTimeout(timeout);
+    if (!r.ok) { var e = await r.json().catch(function() { return {}; }); throw new Error(e.error ? e.error.message : r.statusText); }
+    var d = await r.json();
+    return d.choices && d.choices[0] && d.choices[0].message ? d.choices[0].message.content : '';
+  } catch(e) {
+    clearTimeout(timeout);
+    if (e.name === 'AbortError') throw new Error('Timeout - API demorou muito');
+    throw e;
+  }
+}
+
+async function callMistral(key, model, prompt) {
+  var controller = new AbortController();
+  var timeout = setTimeout(function() { controller.abort(); }, 60000);
+  try {
+    var r = await fetch('https://api.mistral.ai/v1/chat/completions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + key },
+      body: JSON.stringify({ model: model, temperature: 0.9, max_tokens: 8192, messages: [{role: 'system', content: prompt.system},{role: 'user', content: prompt.user}] }),
+      signal: controller.signal
+    });
+    clearTimeout(timeout);
+    if (!r.ok) {
+      var errMsg = 'HTTP ' + r.status;
+      try { var errJson = await r.json(); errMsg = errJson.message || errMsg; } catch(e2) {}
+      throw new Error('Mistral: ' + errMsg);
+    }
+    var d = await r.json();
+    return d.choices && d.choices[0] && d.choices[0].message ? d.choices[0].message.content : '';
+  } catch(e) {
+    clearTimeout(timeout);
+    if (e.name === 'AbortError') throw new Error('Timeout Mistral');
+    throw e;
+  }
+}
+
+// ===== MULTI-LLM ORCHESTRATOR =====
+async function orchestrateMultiLLM(prompt) {
+  var results = {};
+  var tasks = [];
+  var geminiKey = localStorage.getItem('ciu_key_gemini');
+  if (geminiKey) tasks.push({ name:'narrativa', api:'gemini', model:'gemini-2.5-flash', fn: callGemini, key: geminiKey });
+  var claudeKey = localStorage.getItem('ciu_key_claude');
+  if (claudeKey) tasks.push({ name:'cultural', api:'claude', model:'claude-sonnet-4-20250514', fn: callClaude, key: claudeKey });
+  var mistralKey = localStorage.getItem('ciu_key_mistral');
+  if (mistralKey) tasks.push({ name:'ritmo', api:'mistral', model:'mistral-small-latest', fn: callMistral, key: mistralKey });
+  var gptKey = localStorage.getItem('ciu_key_gpt');
+  if (gptKey) tasks.push({ name:'voz', api:'gpt', model:'gpt-4o-mini', fn: callGPT, key: gptKey });
+  toast('Orquestrando ' + tasks.length + ' LLMs...', 'info');
+  for (var i = 0; i < tasks.length; i++) {
+    var task = tasks[i];
+    try {
+      results[task.name] = await task.fn(task.key, task.model, prompt);
+      toast(task.name + ' completo via ' + task.api, 'success');
+    } catch(e) {
+      toast(task.api + ' falhou: ' + e.message, 'error');
+    }
+  }
+  return results;
+}
+
+// ===== ROUTER =====
+async function callRouter(prompt) {
+  var order = [
+    { api:'gemini', model:'gemini-2.5-flash', fn: callGemini },
+    { api:'claude', model:'claude-sonnet-4-20250514', fn: callClaude },
+    { api:'mistral', model:'mistral-small-latest', fn: callMistral },
+    { api:'gpt', model:'gpt-4o-mini', fn: callGPT }
+  ];
+  for (var i = 0; i < order.length; i++) {
+    var entry = order[i];
+    var key = localStorage.getItem(APIs[entry.api].keyStore);
+    if (!key) continue;
+    try {
+      toast('Orquestrando: testando ' + APIs[entry.api].label + '...', 'info');
+      var result = await entry.fn(key, entry.model, prompt);
+      var ri = document.createElement('div');
+      ri.className = 'router-info';
+      ri.innerHTML = '🔀 Gerado via <strong>' + APIs[entry.api].label + '</strong> (' + entry.model + ')';
+      document.getElementById('outputContent').prepend(ri);
+      return result;
+    } catch(e) {
+      var emsg = e.message || '';
+      if (emsg.indexOf('high demand') >= 0 || emsg.indexOf('timeout') >= 0) {
+        toast(APIs[entry.api].label + ' sobrecarregado, tentando novamente...', 'info');
+        await new Promise(function(res) { setTimeout(res, 2000); });
+        try {
+          var r2 = await entry.fn(key, entry.model, prompt);
+          toast('Sucesso na segunda tentativa!', 'success');
+          return r2;
+        } catch(e2) {
+          toast('Router: ' + APIs[entry.api].label + ' falhou — ' + e2.message, 'error');
+        }
+      } else {
+        toast('Router: ' + APIs[entry.api].label + ' falhou — ' + emsg.substring(0, 50), 'error');
+      }
+    }
+  }
+  throw new Error('Nenhuma API disponível. Tente novamente mais tarde ou use o Modo Demo.');
+}
+
+// ===== PARSE OUTPUT =====
+function parseOutput(text) {
+  var sections = ['TEXTO_NARRATIVO','PROMPTS_VISUAIS','INSTRUCOES_VOZ','JSON_METADADOS','CHANGELOG_CULTURAL'];
+  var result = ['','','','',''];
+  var current = -1;
+  var lines = text.split('\n');
+  for (var l = 0; l < lines.length; l++) {
+    var line = lines[l];
+    var found = false;
+    for (var s = 0; s < sections.length; s++) {
+      if (line.indexOf('===' + sections[s] + '===') >= 0) {
+        current = s; found = true; break;
+      }
+    }
+    if (!found && current >= 0) result[current] += line + '\n';
+  }
+  if (result.every(function(r) { return !r.trim(); })) result[0] = text;
+  while (result.length < 5) result.push('');
+  return result.map(function(r) { return r.trim(); });
+}
+
+// ===== GENERATE =====
+async function generateScript() {
+  var btn = document.getElementById('generateBtn');
+  var btnText = document.getElementById('btnText');
+  var spinner = document.getElementById('btnSpinner');
+  var params = {
+    pais: document.getElementById('paisDestino').value,
+    idioma: document.getElementById('idioma').value,
+    tipo: document.getElementById('tipoConteudo').value,
+    duracao: document.getElementById('duracaoTotal').value,
+    blocos: document.getElementById('blocosNarrativos').value,
+    emocao: document.getElementById('emocaoDominante').value,
+    tom: document.getElementById('tomCinematografico').value,
+    velocidade: document.getElementById('velocidadeNarracao').value,
+    densidade: document.getElementById('densidadeLexical').value,
+    objetivo: document.getElementById('objetivoFinal').value,
+    nomePersonagem: document.getElementById('nomePersonagem').value || 'Personagem sem nome',
+    descVisual: document.getElementById('descVisual').value || 'Sem descricao visual',
+    psicologia: document.getElementById('psicologia').value || 'Nao especificada',
+    background: document.getElementById('background').value || 'Nao especificado',
+    instrucoesVisuais: document.getElementById('instrucoesVisuais').value || 'Golden hour lighting, warm tones'
+  };
+  var systemPrompt = getSystemPrompt(params);
+  var userPrompt = 'Gere um roteiro cinematografico completo em ' + params.idioma + ' SOMENTE.\n\nEspecificacoes:\n- Idioma: ' + params.idioma + ' — TODO o texto em ' + (params.idioma === 'en-US' ? 'INGLES americano' : params.idioma) + '\n- Duracao: ' + params.duracao + ' minutos (' + params.blocos + ' blocos)\n- Tom: ' + params.tom + '\n- Emocao: ' + params.emocao + '\n- Velocidade: ' + params.velocidade + '\n- Densidade: ' + params.densidade + '\n- Objetivo: ' + params.objetivo + '\n- Pais: ' + params.pais + '\n\nPersonagem: ' + params.nomePersonagem + '\n- Visual: ' + params.descVisual + '\n- Psicologia: ' + params.psicologia + '\n- Background: ' + params.background + '\n- Instrucoes visuais: ' + params.instrucoesVisuais + '\n\nRETORNE NAS 5 SECOES OBRIGATORIAS. Ative TODAS as 10 camadas do C.I.U. Level 10.';
+
+  var isDemo = document.getElementById('demoMode').checked;
+  var abTest = document.getElementById('abTestMode').checked;
+  btn.disabled = true;
+  btnText.style.display = 'none';
+  spinner.style.display = 'block';
+  var progressBar = document.getElementById('progressBar');
+  var progressFill = document.getElementById('progressFill');
+  progressBar.style.display = 'block';
+  progressFill.style.width = '10%';
+
+  try {
+    var result;
+    var results = [];
+    toast('Gerando roteiro...', 'info');
+    progressFill.style.width = '30%';
+    if (abTest) toast('Gerando versao A...', 'info');
+
+    if (isDemo) {
+      result = generateDemoOutput(params);
+      outputData = parseOutput(result);
+      results.push({ output: outputData, version: 'A' });
+      if (abTest) {
+        progressFill.style.width = '50%';
+        toast('Gerando versao B (variacao)...', 'info');
+        var paramsB = JSON.parse(JSON.stringify(params));
+        paramsB.tom = params.tom === 'drama realista' ? 'conto inspirador' : 'drama realista';
+        result = generateDemoOutput(paramsB);
+        results.push({ output: parseOutput(result), version: 'B' });
+      }
+    } else {
+      var prompt = { system: systemPrompt, user: userPrompt };
+      if (currentAPI === 'router') {
+        result = await callRouter(prompt);
+      } else {
+        var key = localStorage.getItem(APIs[currentAPI].keyStore);
+        if (!key) throw new Error('Configure sua chave de API primeiro (vá em Conexões de API)!');
+        var modelSel = document.getElementById('modelSelect');
+        var model = modelSel ? modelSel.value : APIs[currentAPI].models[0];
+        if (!model) model = APIs[currentAPI].models[0];
+        try {
+          if (currentAPI === 'gemini') result = await callGemini(key, model, prompt);
+          else if (currentAPI === 'claude') result = await callClaude(key, model, prompt);
+          else if (currentAPI === 'mistral') result = await callMistral(key, model, prompt);
+          else result = await callGPT(key, model, prompt);
+        } catch(apiErr) {
+          if (currentAPI === 'gemini' && apiErr.message.indexOf('HIGH_DEMAND') >= 0) {
+            toast('Gemini sobrecarregado, tentando outro modelo...', 'info');
+            var altModels = ['gemini-2.0-flash','gemini-1.5-flash','gemini-1.5-pro'];
+            for (var ai = 0; ai < altModels.length; ai++) {
+              try {
+                result = await callGemini(key, altModels[ai], prompt);
+                toast('Sucesso com ' + altModels[ai] + '!', 'success');
+                break;
+              } catch(e2) {
+                if (e2.message.indexOf('HIGH_DEMAND') >= 0) continue;
+                throw e2;
+              }
+            }
+          } else { throw apiErr; }
+        }
+        outputData = parseOutput(result);
+        results.push({ output: outputData, version: 'A' });
+        if (abTest) {
+          progressFill.style.width = '50%';
+          toast('Gerando versao B...', 'info');
+          var userPromptB = userPrompt.replace('Tom: ' + params.tom, 'Tom: ' + (params.tom === 'drama realista' ? 'conto inspirador' : 'drama realista'));
+          var promptB = { system: systemPrompt, user: userPromptB };
+          var keyB = localStorage.getItem(APIs[currentAPI].keyStore);
+          var modelB = modelSel ? modelSel.value : APIs[currentAPI].models[0];
+          try {
+            if (currentAPI === 'gemini') result = await callGemini(keyB, modelB, promptB);
+            else if (currentAPI === 'claude') result = await callClaude(keyB, modelB, promptB);
+            else if (currentAPI === 'mistral') result = await callMistral(keyB, modelB, promptB);
+            else result = await callGPT(keyB, modelB, promptB);
+          } catch(e) { toast('Versao B falhou: ' + e.message, 'error'); }
+          results.push({ output: parseOutput(result), version: 'B' });
+        }
+      }
+    }
+
+    progressFill.style.width = '80%';
+    outputData = results[0] ? results[0].output : ['','','','',''];
+
+    var area = document.getElementById('outputArea');
+    area.style.display = 'block';
+    area.classList.add('fade-in');
+    switchTab(0);
+    progressFill.style.width = '100%';
+    setTimeout(function() { progressBar.style.display = 'none'; }, 1000);
+
+    addToHistory(outputData, params);
+    renderEmotionChart();
+    renderEconomyMetrics();
+    renderMetacognitive();
+    renderAnalysis();
+
+    var orchPanel = document.getElementById('orchestratorPanel');
+    var usedModel = document.getElementById('modelSelect') ? document.getElementById('modelSelect').value : currentAPI;
+    var usedAPI = APIs[currentAPI] ? APIs[currentAPI].label : currentAPI;
+    var abLabel = abTest ? ' | Versao B: tom alternativo' : '';
+    orchPanel.innerHTML = '<div style="font-size:0.82rem;color:var(--text2);padding:4px 0">' +
+      '<p>🤖 <strong style="color:var(--text)">Orquestrador Multi-LLM (Camada 5):</strong> Ativo</p>' +
+      '<p style="margin-top:6px">API ativa: <strong>' + usedAPI + '</strong> — Modelo: <strong>' + usedModel + '</strong>' + abLabel + '</p>' +
+      '<p style="margin-top:4px;font-size:0.75rem;color:var(--text3)">Roles injetados: Claude→Narrativa | Gemini→Cultural | Mistral→Ritmo | GPT→Voz</p>' +
+      '</div>';
+    orchPanel.style.display = 'block';
+
+    if (document.getElementById('webhookUrl').value) {
+      sendWebhook({ outputs: outputData, params: params, tags: currentTags });
+    }
+
+    if (abTest && results.length > 1) {
+      toast('A/B Test concluido! Versoes A e B geradas.', 'success');
+    } else {
+      toast('Roteiro gerado com sucesso!', 'success');
+    }
+
+    // Scroll to output
+    area.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+  } catch(e) {
+    toast('Erro: ' + e.message, 'error');
+    console.error('Generation error:', e);
+  } finally {
+    btn.disabled = false;
+    btnText.style.display = '';
+    spinner.style.display = 'none';
+  }
+}
+
+// ===== KEYBOARD SHORTCUTS =====
+document.addEventListener('keydown', function(e) {
+  if (e.ctrlKey && e.key === 'g') { e.preventDefault(); selectView('producao'); generateScript(); }
+  if (e.ctrlKey && e.key === 's') { e.preventDefault(); saveCharacter(); }
+});
+
+// ===== INIT =====
+selectAPI('gemini');
+if (localStorage.getItem('ciu_theme') === 'light') {
+  document.body.classList.add('light');
+  var tBtn = document.querySelector('.theme-toggle');
+  if (tBtn) tBtn.textContent = '☀️';
+}
+loadSavedCharacters();
+renderHistory();
+loadSavedPrompts();
+
+var allInputs = document.querySelectorAll('input, select');
+for (var idx = 0; idx < allInputs.length; idx++) {
+  allInputs[idx].onchange = function() { updatePreview(); };
+}
+
+refreshOverview();
+</script>
+</body>
+</html>
