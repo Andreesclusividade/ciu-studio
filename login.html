@@ -3,79 +3,236 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>C.I.U. Login</title>
+  <title>C.I.U. Studio — Acesso</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    :root{
+      --bg:#0b1120;
+      --bg2:#111827;
+      --bg3:#1a2235;
+      --border:#1e2d45;
+      --text:#e2e8f0;
+      --text2:#7b91b0;
+      --text3:#4a6080;
+      --accent:#3d7eff;
+      --accent2:#6c47ff;
+    }
+    html,body{height:100%}
     body{
-      margin:0;
-      font-family:Arial,sans-serif;
-      background:#0a0a0f;
-      color:#fff;
-      height:100vh;
+      font-family:'Inter',sans-serif;
+      background:var(--bg);
+      color:var(--text);
       display:flex;
       align-items:center;
       justify-content:center;
+      min-height:100vh;
+      position:relative;
+      overflow:hidden;
     }
-    .box{
-      width:100%;
-      max-width:360px;
-      padding:24px;
-      border:1px solid #2a2a40;
-      border-radius:12px;
-      background:#141421;
-      text-align:center;
+
+    /* Background glow */
+    body::before{
+      content:'';
+      position:fixed;
+      top:-40%;left:-20%;
+      width:70%;height:70%;
+      background:radial-gradient(circle,rgba(61,126,255,0.07),transparent 65%);
+      pointer-events:none;
     }
-    input{
+    body::after{
+      content:'';
+      position:fixed;
+      bottom:-30%;right:-10%;
+      width:60%;height:60%;
+      background:radial-gradient(circle,rgba(108,71,255,0.06),transparent 65%);
+      pointer-events:none;
+    }
+
+    .card{
+      position:relative;z-index:1;
+      width:100%;max-width:380px;
+      margin:20px;
+      background:var(--bg2);
+      border:1px solid var(--border);
+      border-radius:16px;
+      padding:36px 32px 32px;
+      box-shadow:0 24px 60px rgba(0,0,0,0.5);
+    }
+
+    .logo-row{
+      display:flex;align-items:center;gap:12px;
+      margin-bottom:28px;
+    }
+    .logo-icon{
+      width:40px;height:40px;border-radius:10px;
+      background:linear-gradient(135deg,#3d7eff,#6c47ff);
+      display:flex;align-items:center;justify-content:center;
+      font-size:1.15rem;
+      box-shadow:0 0 20px rgba(61,126,255,0.4);
+      flex-shrink:0;
+    }
+    .logo-text{font-size:1rem;font-weight:800;color:var(--text);letter-spacing:0.3px}
+    .logo-sub{font-size:0.65rem;color:var(--text3);text-transform:uppercase;letter-spacing:1.2px;margin-top:2px}
+
+    h2{
+      font-size:1.25rem;font-weight:700;color:var(--text);
+      margin-bottom:6px;
+    }
+    .subtitle{
+      font-size:0.82rem;color:var(--text2);margin-bottom:24px;
+    }
+
+    label{
+      display:block;
+      font-size:0.7rem;font-weight:600;color:var(--text3);
+      text-transform:uppercase;letter-spacing:1px;
+      margin-bottom:7px;
+    }
+    .input-wrap{position:relative;margin-bottom:20px}
+    input[type=password]{
       width:100%;
-      box-sizing:border-box;
-      padding:12px;
-      margin-top:12px;
-      border-radius:8px;
-      border:1px solid #2a2a40;
-      background:#0a0a0f;
+      padding:11px 44px 11px 14px;
+      background:var(--bg3);
+      border:1px solid var(--border);
+      border-radius:9px;
+      color:var(--text);
+      font-size:0.92rem;
+      font-family:'Inter',sans-serif;
+      transition:border-color .2s,box-shadow .2s;
+      letter-spacing:2px;
+    }
+    input[type=password]:focus{
+      outline:none;
+      border-color:var(--accent);
+      box-shadow:0 0 0 3px rgba(61,126,255,0.12);
+    }
+    input[type=password]::placeholder{letter-spacing:0}
+    .eye-btn{
+      position:absolute;right:12px;top:50%;transform:translateY(-50%);
+      background:none;border:none;cursor:pointer;
+      color:var(--text3);font-size:1rem;padding:4px;
+      transition:color .2s;
+    }
+    .eye-btn:hover{color:var(--text2)}
+
+    button.enter-btn{
+      width:100%;
+      padding:13px;
+      border:none;border-radius:9px;
+      background:linear-gradient(135deg,#3d7eff,#6c47ff);
       color:#fff;
-      font-size:16px;
-    }
-    button{
-      width:100%;
-      margin-top:12px;
-      padding:12px;
-      border:0;
-      border-radius:8px;
-      background:#7c5cff;
-      color:#fff;
-      font-size:16px;
+      font-size:0.95rem;font-weight:700;
+      font-family:'Inter',sans-serif;
       cursor:pointer;
+      transition:all .25s;
+      box-shadow:0 4px 18px rgba(61,126,255,0.3);
+      position:relative;overflow:hidden;
     }
-    p{
-      margin:12px 0 0;
-      font-size:14px;
-      color:#a0a0b8;
+    button.enter-btn::after{
+      content:'';position:absolute;inset:0;
+      background:linear-gradient(135deg,rgba(255,255,255,0.1),transparent);
+      opacity:0;transition:opacity .2s;
     }
+    button.enter-btn:hover{transform:translateY(-1px);box-shadow:0 8px 28px rgba(61,126,255,0.45)}
+    button.enter-btn:hover::after{opacity:1}
+    button.enter-btn:active{transform:translateY(0)}
+
+    .msg{
+      margin-top:14px;
+      font-size:0.8rem;
+      text-align:center;
+      min-height:18px;
+      color:#ef4444;
+      font-weight:500;
+    }
+    .msg.success{color:#22c55e}
+
+    .footer-note{
+      margin-top:24px;
+      padding-top:18px;
+      border-top:1px solid var(--border);
+      font-size:0.72rem;
+      color:var(--text3);
+      text-align:center;
+      line-height:1.6;
+    }
+
+    /* shake animation on wrong pwd */
+    @keyframes shake{
+      0%,100%{transform:translateX(0)}
+      20%{transform:translateX(-6px)}
+      40%{transform:translateX(6px)}
+      60%{transform:translateX(-4px)}
+      80%{transform:translateX(4px)}
+    }
+    .shake{animation:shake .35s ease}
   </style>
 </head>
 <body>
-  <div class="box">
-    <h1>C.I.U. Studio</h1>
-    <p>Digite a senha para acessar</p>
-    <input id="pwd" type="password" placeholder="Senha">
-    <button onclick="go()">Entrar</button>
-    <p id="msg"></p>
+  <div class="card" id="card">
+    <div class="logo-row">
+      <div class="logo-icon">🎬</div>
+      <div>
+        <div class="logo-text">CIU STUDIO</div>
+        <div class="logo-sub">Creative Intelligence Universal</div>
+      </div>
+    </div>
+
+    <h2>Bem-vindo de volta</h2>
+    <p class="subtitle">Digite a senha para acessar o sistema.</p>
+
+    <label for="pwd">Senha de acesso</label>
+    <div class="input-wrap">
+      <input type="password" id="pwd" placeholder="••••••••••" autofocus
+        onkeydown="if(event.key==='Enter')go()">
+      <button class="eye-btn" onclick="toggleEye(this)" tabindex="-1" type="button">👁️</button>
+    </div>
+
+    <button class="enter-btn" onclick="go()">Entrar no Studio</button>
+    <div class="msg" id="msg"></div>
+
+    <div class="footer-note">
+      Acesso restrito — C.I.U. Level 10 Ultimate v11
+    </div>
   </div>
 
   <script>
-  function go(){
-    const pwd = document.getElementById('pwd').value;
-    if(pwd === 'ciu2026pro'){
-      localStorage.setItem('ciu-ok','1');
-      window.location.replace('/ciu-studio-v11-saas.html');
-    }else{
-      document.getElementById('msg').textContent = 'Senha incorreta';
+    // Auto-redirect if already authenticated
+    if (localStorage.getItem('ciu-ok') === '1') {
+      window.location.href = '/ciu-studio-v11-saas.html';
     }
-  }
 
-  if(localStorage.getItem('ciu-ok') === '1'){
-    window.location.replace('/ciu-studio-v11-saas.html');
-  }
+    function go() {
+      var pwd = document.getElementById('pwd').value;
+      var msg = document.getElementById('msg');
+      if (pwd === 'ciu2026pro') {
+        msg.className = 'msg success';
+        msg.textContent = 'Acesso liberado — redirecionando...';
+        localStorage.setItem('ciu-ok', '1');
+        setTimeout(function() {
+          window.location.href = '/ciu-studio-v11-saas.html';
+        }, 600);
+      } else {
+        msg.className = 'msg';
+        msg.textContent = 'Senha incorreta. Tente novamente.';
+        var card = document.getElementById('card');
+        card.classList.remove('shake');
+        void card.offsetWidth; // reflow to restart animation
+        card.classList.add('shake');
+      }
+    }
+
+    function toggleEye(btn) {
+      var input = document.getElementById('pwd');
+      if (input.type === 'password') {
+        input.type = 'text';
+        btn.textContent = '🙈';
+      } else {
+        input.type = 'password';
+        btn.textContent = '👁️';
+      }
+    }
   </script>
 </body>
 </html>
